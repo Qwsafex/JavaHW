@@ -10,12 +10,4 @@ public class MyNode {
         this.prev = prev;
     }
 
-    public void kick() {
-        if (next != null){
-            next.prev = prev;
-        }
-        if (prev != null){
-            prev.next = next;
-        }
-    }
 }
