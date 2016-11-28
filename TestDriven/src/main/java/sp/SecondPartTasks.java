@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -59,11 +58,12 @@ public final class SecondPartTasks {
     // Вы крупный поставщик продуктов. Каждая торговая сеть делает вам заказ в виде Map<Товар, Количество>.
     // Необходимо вычислить, какой товар и в каком количестве надо поставить.
     public static Map<String, Integer> calculateGlobalOrder(List<Map<String, Integer>> orders) {
-        BiConsumer<Map<String, Integer>, Map<String, Integer>> combine = (map1, map2) -> {
-            map2.forEach((key, val) -> {
-                map1.compute(key, (k,v) -> (v == null) ? val : val + v);
-            });
-        };
-        return orders.stream().collect(HashMap::new, combine, combine);
+        return orders.stream().reduce(new HashMap<String, Integer>(),
+                (map1, map2) -> {
+                    map2.forEach((key, val) -> {
+                        map1.compute(key, (k,v) -> (v == null) ? val : val + v);
+                    });
+                    return map1;
+                });
     }
 }
