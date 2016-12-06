@@ -51,6 +51,7 @@ public class SecondPartTasksTest {
         for (String line : lines) {
             ps.println(line);
         }
+        ps.close();
     }
 
     @Test
@@ -64,8 +65,8 @@ public class SecondPartTasksTest {
     @Test
     public void testFindPrinter() {
         HashMap<String, List<String>> authors = new HashMap<>();
-        authors.put("Mike", Arrays.asList("a"));
-        authors.put("Jack", Arrays.asList("ab"));
+        authors.put("Mike", Collections.singletonList("a"));
+        authors.put("Jack", Collections.singletonList("ab"));
         authors.put("Dave", Arrays.asList("a", "b", "c"));
         authors.put("Matt", Arrays.asList("a", "b", "c", "d"));
         authors.put("John", Arrays.asList("a", "b", "c", "d", "e"));
@@ -75,11 +76,11 @@ public class SecondPartTasksTest {
     @Test
     public void findPrinterSingleAndEmpty(){
         HashMap<String, List<String>> authors = new HashMap<>();
-        authors.put("Mike", Arrays.asList());
-        authors.put("Jack", Arrays.asList(""));
-        authors.put("Dave", Arrays.asList("abcd"));
-        authors.put("Matt", Arrays.asList("abcdef"));
-        authors.put("John", Arrays.asList("abcdefghi"));
+        authors.put("Mike", Collections.emptyList());
+        authors.put("Jack", Collections.singletonList(""));
+        authors.put("Dave", Collections.singletonList("abcd"));
+        authors.put("Matt", Collections.singletonList("abcdef"));
+        authors.put("John", Collections.singletonList("abcdefghi"));
         assertEquals("John", findPrinter(authors));
     }
 
