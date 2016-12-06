@@ -6,10 +6,10 @@ public class MyHashMap {
     // сейчас все методы бросают исключение
     // это сделано, чтобы код компилировался, в конечном коде такого исключения быть не должно
 
-    MyLinkedList[] lists;
+    private MyLinkedList[] lists;
 
-    int keyCount;
-    int capacity;
+    private int keyCount;
+    private int capacity;
 
     public MyHashMap(int capacity){
         this.capacity = capacity;
@@ -21,14 +21,18 @@ public class MyHashMap {
         return keyCount;
     }
 
+    private int getIndex(String key){
+        return key.hashCode() % capacity;
+    }
+
     public boolean contains(String key) {
-        MyLinkedList list = lists[key.hashCode() % capacity];
+        MyLinkedList list = lists[getIndex(key)];
         if (list == null){
             return false;
         }
         MyNode current = list.getHead();
         while (current != null){
-            if (current.first.compareTo(key) == 0){
+            if (current.first.equals(key)){
                 return true;
             }
             current = current.next;
@@ -37,13 +41,13 @@ public class MyHashMap {
     }
 
     public String get(String key) {
-        MyLinkedList list = lists[key.hashCode() % capacity];
+        MyLinkedList list = lists[getIndex(key)];
         if (list == null){
             return null;
         }
         MyNode current = list.getHead();
         while (current != null){
-            if (current.first.compareTo(key) == 0){
+            if (current.first.equals(key)){
                 return current.second;
             }
             current = current.next;
@@ -52,17 +56,14 @@ public class MyHashMap {
     }
 
     public String put(String key, String value) {
-        if(!contains(key)){
-            keyCount++;
-        }
-        MyLinkedList list = lists[key.hashCode() % capacity];
+        MyLinkedList list = lists[getIndex(key)];
         if (list == null){
             list = new MyLinkedList();
-            lists[key.hashCode() % capacity] = list;
+            lists[getIndex(key)] = list;
         }
         MyNode current = list.getHead();
         while (current != null){
-            if (current.first.compareTo(key) == 0){
+            if (current.first.equals(key)){
                 String result = current.second;
                 current.second = value;
                 return result;
@@ -70,21 +71,20 @@ public class MyHashMap {
             current = current.next;
         }
         list.add(key, value);
+        keyCount++;
         return null;
     }
 
     public String remove(String key) {
-        MyLinkedList list = lists[key.hashCode() % capacity];
+        MyLinkedList list = lists[getIndex(key)];
         if (list == null){
             return null;
         }
         MyNode current = list.getHead();
         while (current != null){
-            if (current.first.compareTo(key) == 0){
+            if (current.first.equals(key)){
                 list.remove(current);
-                if(list.empty()){
-                    keyCount--;
-                }
+                keyCount--;
                 return current.second;
             }
             current = current.next;

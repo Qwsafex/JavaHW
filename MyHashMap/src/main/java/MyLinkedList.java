@@ -1,5 +1,5 @@
 public class MyLinkedList {
-    MyNode head;
+    private MyNode head;
     public boolean empty() {
         return head == null;
     }
