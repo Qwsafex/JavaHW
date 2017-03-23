@@ -1,5 +1,6 @@
 package vcs;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,6 +42,9 @@ public class Blob extends GitObject {
     }
 
     public Blob(Path filePath) throws IOException {
+        if (Files.notExists(filePath)) {
+            throw new FileNotFoundException("File " + filePath.toString() + " not found!");
+        }
         path = filePath.toString();
         content = Files.readAllBytes(filePath);
     }

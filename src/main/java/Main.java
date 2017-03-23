@@ -54,9 +54,9 @@ public class Main {
             }
             case "log": {
                 try {
-                    List<String> log = vcs.log();
-                    for (String record : log) {
-                        System.out.print(record);
+                    List<Commit> log = vcs.log();
+                    for (Commit record : log) {
+                        System.out.print(record.toString());
                         System.out.println("---------------------");
                     }
                 } catch (IOException | VCSFilesCorruptedException | RefNotFoundException e) {

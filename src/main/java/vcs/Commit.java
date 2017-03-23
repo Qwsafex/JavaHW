@@ -56,4 +56,8 @@ public class Commit extends GitObject{
     public List<LightBlob> getBlobs() {
         return blobs;
     }
+
+    public String getMessage() {
+        return message;
+    }
 }

@@ -5,7 +5,7 @@ import java.nio.file.*;
 import java.util.*;
 
 public class VCS {
-    private static final Path GIT_DIRECTORY = Paths.get(".git/");
+    private static final Path GIT_DIRECTORY = Paths.get(".vcs/");
     private static final Path REFS_DIRECTORY = GIT_DIRECTORY.resolve("refs/");
     private static final Path OBJS_DIRECTORY = GIT_DIRECTORY.resolve("objects/");
     private static final Path HEAD_FILE = GIT_DIRECTORY.resolve("HEAD");
@@ -184,8 +184,8 @@ public class VCS {
         setIndex(index);
     }
 
-    public List<String> log() throws IOException, VCSFilesCorruptedException, RefNotFoundException {
-        List<String> result = new ArrayList<>();
+    public List<Commit> log() throws IOException, VCSFilesCorruptedException, RefNotFoundException {
+        List<Commit> result = new ArrayList<>();
         String lastCommitHash = null;
         if (VCSRef.isRef(getHead())) {
             lastCommitHash = getRefContent(VCSRef.fromString(getHead()));
@@ -195,9 +195,10 @@ public class VCS {
         }
         while (lastCommitHash != null) {
             Commit lastCommit = (Commit) getObject(lastCommitHash);
-            result.add(lastCommit.toString());
+            result.add(lastCommit);
             lastCommitHash = lastCommit.getPrevCommit();
         }
+        Collections.reverse(result);
         return result;
     }
 
@@ -333,6 +334,7 @@ public class VCS {
         if (VCSRef.isRef(ref)) {
             ref = VCSRef.fromString(ref).getName();
         }
+        refs.put(ref, hash);
         writeObject(hash, REFS_DIRECTORY.resolve(ref).toFile());
     }
 
