@@ -41,14 +41,14 @@ public class Main {
                 if (args[1].equals("-d")) {
                     try {
                         vcs.deleteBranch(args[2]);
-                    } catch (VCSException | IOException | DeleteActiveBranchException e) {
+                    } catch (VCSException | IOException e) {
                         System.out.println(e.getMessage());
                     }
                 }
                 else {
                     try {
                         vcs.createBranch(args[1]);
-                    } catch (VCSException | IOException | BranchAlreadyExistsException e) {
+                    } catch (VCSException | IOException e) {
                         System.out.println(e.getMessage());
                     }
                 }
