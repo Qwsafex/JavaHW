@@ -4,6 +4,10 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
+/**
+ * Class that contains all VCS interface methods.
+ */
+
 public class VCS {
     private static final Path GIT_DIRECTORY = Paths.get(".vcs/");
     private static final Path REFS_DIRECTORY = GIT_DIRECTORY.resolve("refs/");

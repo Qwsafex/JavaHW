@@ -1,13 +1,12 @@
 package vcs;
 
-@SuppressWarnings("WeakerAccess")
-public class VCSRef {
+class VCSRef {
     private static final String REF_PREFIX = "ref: ";
     private String name;
-    public static boolean isRef(String name) {
+    static boolean isRef(String name) {
         return name.startsWith(REF_PREFIX);
     }
-    public VCSRef(String name) {
+    VCSRef(String name) {
         this.name = name;
     }
     static VCSRef fromString(String refString) {
@@ -19,7 +18,7 @@ public class VCSRef {
         return REF_PREFIX + name;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 }

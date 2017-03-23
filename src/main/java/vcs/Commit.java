@@ -7,14 +7,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Class that encapsulates a single commit.
+ */
+
 public class Commit extends GitObject{
     private final long time;
     private final String message;
     private final List<LightBlob> blobs;
     private final String prevCommit;
 
-    @SuppressWarnings("WeakerAccess")
-    public Commit(String message, List<LightBlob> blobs, String prevCommit) {
+    Commit(String message, List<LightBlob> blobs, String prevCommit) {
         this.message = message;
         this.blobs = blobs;
         this.prevCommit = prevCommit;
@@ -36,6 +39,10 @@ public class Commit extends GitObject{
 
     }
 
+    /**
+     * User-friendly string representation of commit.
+     * @return string representation of commit
+     */
     @SuppressWarnings({"StringBufferReplaceableByString", "StringConcatenationInsideStringBufferAppend"})
     @Override
     public String toString() {
@@ -51,18 +58,15 @@ public class Commit extends GitObject{
         return result.toString();
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public String getPrevCommit() {
+    String getPrevCommit() {
         return prevCommit;
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public List<LightBlob> getBlobs() {
+    List<LightBlob> getBlobs() {
         return blobs;
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public String getMessage() {
+    String getMessage() {
         return message;
     }
 }

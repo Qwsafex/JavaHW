@@ -1,3 +1,5 @@
+package console;
+
 import vcs.*;
 
 import java.io.IOException;

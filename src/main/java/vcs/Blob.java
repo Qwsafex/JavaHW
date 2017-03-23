@@ -9,8 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 
-@SuppressWarnings("WeakerAccess")
-public class Blob extends GitObject {
+class Blob extends GitObject {
     private String path;
     private byte[] content;
 
@@ -42,7 +41,7 @@ public class Blob extends GitObject {
         }
     }
 
-    public Blob(Path filePath) throws IOException {
+    Blob(Path filePath) throws IOException {
         if (Files.notExists(filePath)) {
             throw new FileNotFoundException("File " + filePath.toString() + " not found!");
         }
