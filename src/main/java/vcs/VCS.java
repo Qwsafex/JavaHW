@@ -17,82 +17,7 @@ public class VCS {
     private String head = null;
     private ArrayList<LightBlob> index = null;
 
-    /**
-     *
-     * @param branchName name of branch to be merge into current
-     * @return list of conflicting pathes
-     * @throws BranchNotFoundException if there's no branch with the specified name
-     * @throws VCSFilesCorruptedException if one of .vcs/ files is absent or contains corrupted data
-     * @throws IOException if for some reason VCS files cannot be read or written
-     */
-    public List<String> merge(String branchName) throws IOException, BranchNotFoundException, VCSFilesCorruptedException {
-        if (!branchExists(branchName)) {
-            throw new BranchNotFoundException(branchName);
-        }
-        List<LightBlob> currentBlobs = getBlobsRecursively(getHeadCommit());
-        List<LightBlob> newBlobs = getBlobsRecursively(getRefContent(new VCSRef(branchName)));
-        Map<String, LightBlob> presentBlobs = new HashMap<>();
-        currentBlobs.forEach(blob -> presentBlobs.put(blob.getPath(), blob));
-        List<String> conflicts = new ArrayList<>();
-        for (LightBlob lightBlob : newBlobs) {
-            if (presentBlobs.containsKey(lightBlob.getPath()) &&
-                    !presentBlobs.get(lightBlob.getPath()).getHash().equals(lightBlob.getHash())) {
-                conflicts.add(lightBlob.getPath());
-                Blob blob = (Blob) getObject(lightBlob.getHash());
-                Files.write(Paths.get(lightBlob.getPath()), CONFLICT_SEPARATOR.getBytes(), StandardOpenOption.APPEND);
-                Files.write(Paths.get(lightBlob.getPath()), blob.getContent(), StandardOpenOption.APPEND);
-            }
-            else {
-                putBlobOnDisk(lightBlob);
-                addBlobToIndex((Blob) getObject(lightBlob.getHash()));
-            }
-        }
-        return conflicts;
-    }
 
-    private List<LightBlob> getBlobsRecursively(String commitHash) throws IOException, VCSFilesCorruptedException {
-        Map<String, LightBlob> blobs = new HashMap<>();
-        String currentCommitHash = commitHash;
-        while (currentCommitHash != null) {
-            Commit currentCommit = (Commit) getObject(currentCommitHash);
-            currentCommit.getBlobs().forEach(blob -> blobs.putIfAbsent(blob.getPath(), blob));
-            currentCommitHash = currentCommit.getPrevCommit();
-        }
-        List<LightBlob> result = new ArrayList<>();
-        blobs.forEach((key, blob) -> result.add(blob));
-        return result;
-    }
-
-    public void checkout(String revision) throws IOException, BranchNotFoundException, VCSFilesCorruptedException {
-        if (branchExists(revision)) {
-            VCSRef branch = new VCSRef(revision);
-            if (getHead().equals(branch.toString())) {
-                return;
-            }
-            setHead(branch.toString());
-        }
-        else {
-            if (getHead().equals(revision)) {
-                return;
-            }
-            setHead(revision);
-        }
-
-        List<LightBlob> blobs = getBlobsRecursively(getHeadCommit());
-        for (LightBlob blob : blobs) {
-            putBlobOnDisk(blob);
-        }
-    }
-
-    private void putBlobOnDisk(LightBlob lightBlob) throws IOException, VCSFilesCorruptedException {
-        Path blobPath = Paths.get(lightBlob.getPath());
-        Path blobParent = blobPath.getParent();
-        if (blobParent != null && Files.notExists(blobParent)) {
-            Files.createDirectories(blobParent);
-        }
-        Blob blob = (Blob) getObject(lightBlob.getHash());
-        Files.write(blobPath, blob.getContent());
-    }
 
     public VCS() throws IOException, VCSException {
         try {
@@ -131,10 +56,79 @@ public class VCS {
         }
     }
 
-    public void createBranch(String branchName) throws VCSException, IOException {
+    /**
+     * Sets HEAD to revison and makes files consistent with revision state.
+     * @param revision name of a commit or a branch to checkout to
+     * @throws IOException if for some reason VCS files cannot be read or written
+     * @throws BranchNotFoundException if passed revision is branch and there's no such branch
+     * @throws VCSFilesCorruptedException if VCS files are absent or corrupted
+     */
+    public void checkout(String revision) throws IOException, BranchNotFoundException, VCSFilesCorruptedException {
+        if (branchExists(revision)) {
+            VCSRef branch = new VCSRef(revision);
+            if (getHead().equals(branch.toString())) {
+                return;
+            }
+            setHead(branch.toString());
+        }
+        else {
+            if (getHead().equals(revision)) {
+                return;
+            }
+            setHead(revision);
+        }
+
+        List<LightBlob> blobs = getBlobsRecursively(getHeadCommit());
+        for (LightBlob blob : blobs) {
+            putBlobOnDisk(blob);
+        }
+    }
+    /**
+     * Merges branchName into current branch.
+     *
+     * Conflicting file contents are merged with separator.
+     * @param branchName name of branch to be merge into current
+     * @return list of conflicting paths
+     * @throws BranchNotFoundException if there's no branch with the specified name
+     * @throws VCSFilesCorruptedException if one of .vcs/ files is absent or contains corrupted data
+     * @throws IOException if for some reason VCS files cannot be read or written
+     */
+    public List<String> merge(String branchName) throws IOException, BranchNotFoundException, VCSFilesCorruptedException {
+        if (!branchExists(branchName)) {
+            throw new BranchNotFoundException(branchName);
+        }
+        List<LightBlob> currentBlobs = getBlobsRecursively(getHeadCommit());
+        List<LightBlob> newBlobs = getBlobsRecursively(getRefContent(new VCSRef(branchName)));
+        Map<String, LightBlob> presentBlobs = new HashMap<>();
+        currentBlobs.forEach(blob -> presentBlobs.put(blob.getPath(), blob));
+        List<String> conflicts = new ArrayList<>();
+        for (LightBlob lightBlob : newBlobs) {
+            if (presentBlobs.containsKey(lightBlob.getPath()) &&
+                    !presentBlobs.get(lightBlob.getPath()).getHash().equals(lightBlob.getHash())) {
+                conflicts.add(lightBlob.getPath());
+                Blob blob = (Blob) getObject(lightBlob.getHash());
+                Files.write(Paths.get(lightBlob.getPath()), CONFLICT_SEPARATOR.getBytes(), StandardOpenOption.APPEND);
+                Files.write(Paths.get(lightBlob.getPath()), blob.getContent(), StandardOpenOption.APPEND);
+            }
+            else {
+                putBlobOnDisk(lightBlob);
+                addBlobToIndex((Blob) getObject(lightBlob.getHash()));
+            }
+        }
+        return conflicts;
+    }
+
+    /**
+     * Creates new branch pointing to same commit as HEAD.
+     * @param branchName name for a newly created branch
+     * @throws IOException if for some reason VCS files cannot be read or written
+     * @throws BranchAlreadyExistsException if branchName already exists
+     * @throws VCSFilesCorruptedException if VCS files are absent or corrupted
+     */
+    public void createBranch(String branchName) throws IOException, BranchAlreadyExistsException, VCSFilesCorruptedException {
         Path branchPath = REFS_DIRECTORY.resolve(branchName);
         if (Files.exists(branchPath)) {
-            throw new VCSException("A branch '" + branchName + "' already exists!");
+            throw new BranchAlreadyExistsException("A branch '" + branchName + "' already exists!");
         }
         try {
             Files.createFile(branchPath);
@@ -144,15 +138,31 @@ public class VCS {
         // TODO: handle ref not found
         writeObject(getHeadCommit(), branchPath.toFile());
     }
-    public void deleteBranch(String branchName) throws VCSException, IOException {
+
+    /**
+     * Deletes specified branch.
+     * @param branchName branch to be deleted
+     * @throws IOException if for some reason VCS files cannot be read or written
+     * @throws DeleteActiveBranchException if branchName is active branch
+     * @throws VCSFilesCorruptedException if VCS files are absent or corrupted
+     * @throws BranchNotFoundException if branchName does not exist
+     */
+    public void deleteBranch(String branchName) throws IOException, DeleteActiveBranchException,
+            VCSFilesCorruptedException, BranchNotFoundException {
         assertBranchExists(branchName);
         if (branchName.equals(getHead())) {
-            throw new VCSException("Cannot delete branch '" + branchName + "' while you are currently on.");
+            throw new DeleteActiveBranchException("Cannot delete branch '" + branchName + "' while you are currently on.");
         }
         Files.delete(REFS_DIRECTORY.resolve(branchName));
     }
 
-    public void add(Path filePath) throws IOException, VCSException {
+    /**
+     * Adds file to stage for the next commit.
+     * @param filePath file to add
+     * @throws IOException if for some reason VCS files cannot be read or written
+     * @throws VCSFilesCorruptedException if VCS files are absent or corrupted
+     */
+    public void add(Path filePath) throws IOException, VCSFilesCorruptedException {
         if (Files.isDirectory(filePath)) {
             throw new UnsupportedOperationException();
         }
@@ -161,28 +171,12 @@ public class VCS {
         addBlobToIndex(newBlob);
     }
 
-    private void addBlobToIndex(Blob blob) throws IOException, VCSFilesCorruptedException {
-        ArrayList<LightBlob> index = getIndex();
-        boolean found = false;
-        for (int i = 0; i < index.size(); i++) {
-            LightBlob currentBlob = index.get(i);
-            if (blob.getPath().equals(currentBlob.getPath())) {
-                if (!blob.getSHA().equals(currentBlob.getHash())) {
-                    index.set(i, blob.getLightBlob());
-                }
-                else {
-                    return;
-                }
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            index.add(blob.getLightBlob());
-        }
-        setIndex(index);
-    }
-
+    /**
+     * Returns list of all commits in the current branch.
+     * @return list of all commits in the current branch
+     * @throws IOException if for some reason VCS files cannot be read or written
+     * @throws VCSFilesCorruptedException if VCS files are absent or corrupted
+     */
     public List<Commit> log() throws IOException, VCSFilesCorruptedException {
         List<Commit> result = new ArrayList<>();
         String lastCommitHash;
@@ -201,7 +195,14 @@ public class VCS {
         return result;
     }
 
-    public void commit(String commitMessage) throws NothingToCommitException, IOException, VCSException {
+    /**
+     * Creates new commit from all staged files.
+     * @param commitMessage a commit message
+     * @throws NothingToCommitException if there no files staged for commit
+     * @throws IOException if for some reason VCS files cannot be read or written
+     * @throws VCSFilesCorruptedException if VCS files are absent or corrupted
+     */
+    public void commit(String commitMessage) throws NothingToCommitException, IOException, VCSFilesCorruptedException {
         List<LightBlob> index = getIndex();
         if (index.size() == 0) {
             throw new NothingToCommitException("Nothing to commit");
@@ -332,7 +333,7 @@ public class VCS {
         writeObject(hash, REFS_DIRECTORY.resolve(ref).toFile());
     }
 
-    private void writeGitObject(GitObject gitObject) throws VCSException {
+    private void writeGitObject(GitObject gitObject) throws IOException {
         // Destination determines object content
         try {
             Path path = OBJS_DIRECTORY.resolve(gitObject.getSHA());
@@ -341,7 +342,7 @@ public class VCS {
             }
             writeObject(gitObject, path.toFile());
         } catch (IOException e) {
-            throw new VCSException("Can't write "+ gitObject.getSHA() +" object to file!");
+            throw new IOException("Can't write "+ gitObject.getSHA() +" object to file!");
         }
     }
     private GitObject readGitObject(String hash) throws IOException, VCSFilesCorruptedException {
@@ -366,6 +367,47 @@ public class VCS {
         objInStream.close();
         inStream.close();
         return object;
-
+    }
+    private List<LightBlob> getBlobsRecursively(String commitHash) throws IOException, VCSFilesCorruptedException {
+        Map<String, LightBlob> blobs = new HashMap<>();
+        String currentCommitHash = commitHash;
+        while (currentCommitHash != null) {
+            Commit currentCommit = (Commit) getObject(currentCommitHash);
+            currentCommit.getBlobs().forEach(blob -> blobs.putIfAbsent(blob.getPath(), blob));
+            currentCommitHash = currentCommit.getPrevCommit();
+        }
+        List<LightBlob> result = new ArrayList<>();
+        blobs.forEach((key, blob) -> result.add(blob));
+        return result;
+    }
+    private void putBlobOnDisk(LightBlob lightBlob) throws IOException, VCSFilesCorruptedException {
+        Path blobPath = Paths.get(lightBlob.getPath());
+        Path blobParent = blobPath.getParent();
+        if (blobParent != null && Files.notExists(blobParent)) {
+            Files.createDirectories(blobParent);
+        }
+        Blob blob = (Blob) getObject(lightBlob.getHash());
+        Files.write(blobPath, blob.getContent());
+    }
+    private void addBlobToIndex(Blob blob) throws IOException, VCSFilesCorruptedException {
+        ArrayList<LightBlob> index = getIndex();
+        boolean found = false;
+        for (int i = 0; i < index.size(); i++) {
+            LightBlob currentBlob = index.get(i);
+            if (blob.getPath().equals(currentBlob.getPath())) {
+                if (!blob.getSHA().equals(currentBlob.getHash())) {
+                    index.set(i, blob.getLightBlob());
+                }
+                else {
+                    return;
+                }
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            index.add(blob.getLightBlob());
+        }
+        setIndex(index);
     }
 }
