@@ -2,6 +2,7 @@ package vcs;
 
 import java.io.Serializable;
 
+@SuppressWarnings("WeakerAccess")
 public class LightBlob implements Serializable{
     private String path;
     private String hash;

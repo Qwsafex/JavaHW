@@ -21,12 +21,11 @@ public class VCS {
      *
      * @param branchName name of branch to be merge into current
      * @return list of conflicting pathes
-     * @throws BranchNotFoundException
-     * @throws VCSFilesCorruptedException
-     * @throws RefNotFoundException
-     * @throws IOException
+     * @throws BranchNotFoundException if there's no branch with the specified name
+     * @throws VCSFilesCorruptedException if one of .vcs/ files is absent or contains corrupted data
+     * @throws IOException if for some reason VCS files cannot be read or written
      */
-    public List<String> merge(String branchName) throws VCSException, IOException {
+    public List<String> merge(String branchName) throws IOException, BranchNotFoundException, VCSFilesCorruptedException {
         if (!branchExists(branchName)) {
             throw new BranchNotFoundException(branchName);
         }
@@ -64,7 +63,7 @@ public class VCS {
         return result;
     }
 
-    public void checkout(String revision) throws IOException, BranchNotFoundException, VCSFilesCorruptedException, RefNotFoundException {
+    public void checkout(String revision) throws IOException, BranchNotFoundException, VCSFilesCorruptedException {
         if (branchExists(revision)) {
             VCSRef branch = new VCSRef(revision);
             if (getHead().equals(branch.toString())) {
@@ -162,7 +161,7 @@ public class VCS {
         addBlobToIndex(newBlob);
     }
 
-    private void addBlobToIndex(Blob blob) throws IOException, VCSException {
+    private void addBlobToIndex(Blob blob) throws IOException, VCSFilesCorruptedException {
         ArrayList<LightBlob> index = getIndex();
         boolean found = false;
         for (int i = 0; i < index.size(); i++) {
@@ -184,9 +183,9 @@ public class VCS {
         setIndex(index);
     }
 
-    public List<Commit> log() throws IOException, VCSFilesCorruptedException, RefNotFoundException {
+    public List<Commit> log() throws IOException, VCSFilesCorruptedException {
         List<Commit> result = new ArrayList<>();
-        String lastCommitHash = null;
+        String lastCommitHash;
         if (VCSRef.isRef(getHead())) {
             lastCommitHash = getRefContent(VCSRef.fromString(getHead()));
         }
@@ -223,8 +222,6 @@ public class VCS {
         if (!objects.containsKey(hash)) {
             try {
                 objects.put(hash, readGitObject(hash));
-            } catch (ClassNotFoundException e) {
-                throw new VCSFilesCorruptedException();
             } catch (IOException e) {
                 throw new IOException("Cannot get object from '"+ hash +"' file");
             }
@@ -250,16 +247,15 @@ public class VCS {
                 head = (String) readObject(HEAD_FILE.toFile());
             } catch (IOException e) {
                 // TODO: throw custom exception?
-                throw e;
-                //throw new IOException("Cannot read HEAD file!");
+                throw new IOException("Cannot read HEAD file!");
             } catch (ClassNotFoundException e) {
-                throw new VCSFilesCorruptedException();
+                throw new VCSFilesCorruptedException(HEAD_FILE + " is corrupted!");
             }
         }
         return head;
     }
 
-    private String getHeadCommit() throws IOException, RefNotFoundException, VCSFilesCorruptedException {
+    private String getHeadCommit() throws IOException, VCSFilesCorruptedException {
         String head = getHead();
         if (VCSRef.isRef(head)) {
             return getRefContent(VCSRef.fromString(head));
@@ -268,11 +264,11 @@ public class VCS {
             return head;
     }
 
-    private String getRefContent(VCSRef ref) throws RefNotFoundException, IOException, VCSFilesCorruptedException {
+    private String getRefContent(VCSRef ref) throws IOException, VCSFilesCorruptedException {
         if (!refs.containsKey(ref.getName())) {
             Path refPath = REFS_DIRECTORY.resolve(ref.getName());
             if (Files.notExists(refPath)) {
-                throw new RefNotFoundException();
+                throw new VCSFilesCorruptedException(refPath + " is absent!");
             }
             try {
                 String refContent = (String) readObject(refPath.toFile());
@@ -280,7 +276,7 @@ public class VCS {
             } catch (IOException e) {
                 throw new IOException("Cannot read ref file for "+ ref);
             } catch (ClassNotFoundException e) {
-                throw new VCSFilesCorruptedException();
+                throw new VCSFilesCorruptedException(refPath + " is corrupted!");
             }
         }
         return refs.get(ref.getName());
@@ -296,7 +292,7 @@ public class VCS {
         }
     }
 
-    private ArrayList<LightBlob> getIndex() throws VCSException, IOException {
+    private ArrayList<LightBlob> getIndex() throws IOException, VCSFilesCorruptedException {
         if (index == null) {
             try {
                 FileInputStream indexIn = new FileInputStream(INDEX_FILE.toFile());
@@ -304,26 +300,24 @@ public class VCS {
                 //noinspection unchecked
                 index = (ArrayList<LightBlob>) indexObjIn.readObject();
             } catch (FileNotFoundException e) {
-                // TODO: throw more specialized exception
-                throw new VCSException("Index file not found!");
+                throw new VCSFilesCorruptedException("Index file not found!");
             } catch (IOException e) {
                 // TODO: throw another exception?
                 throw new IOException("Unable to read from index file!");
             } catch (ClassNotFoundException e) {
-                throw new VCSFilesCorruptedException();
+                throw new VCSFilesCorruptedException("Index file is corrupted!");
             }
         }
         return index;
     }
 
-    private void setIndex(ArrayList<LightBlob> index) throws VCSException, IOException {
+    private void setIndex(ArrayList<LightBlob> index) throws IOException, VCSFilesCorruptedException {
         this.index = index;
         try {
             writeObject(index, INDEX_FILE.toFile());
         }
         catch (FileNotFoundException e) {
-            // TODO: throw more specialized exception
-            throw new VCSException("Index file not found!");
+            throw new VCSFilesCorruptedException("Index file not found!");
         } catch (IOException e) {
             // TODO: throw another exception?
             throw new IOException("Unable to write to index file!");
@@ -350,8 +344,13 @@ public class VCS {
             throw new VCSException("Can't write "+ gitObject.getSHA() +" object to file!");
         }
     }
-    private GitObject readGitObject(String hash) throws IOException, ClassNotFoundException {
-        return (GitObject) readObject(OBJS_DIRECTORY.resolve(hash).toFile());
+    private GitObject readGitObject(String hash) throws IOException, VCSFilesCorruptedException {
+        Path path = OBJS_DIRECTORY.resolve(hash);
+        try {
+            return (GitObject) readObject(path.toFile());
+        } catch (ClassNotFoundException e) {
+            throw new VCSFilesCorruptedException(path.toString() + " is corrupted!");
+        }
     }
     private void writeObject(Object object, File destination) throws IOException {
         FileOutputStream outStream = new FileOutputStream(destination);

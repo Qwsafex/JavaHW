@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 
+@SuppressWarnings("WeakerAccess")
 public class Blob extends GitObject {
     private String path;
     private byte[] content;
@@ -49,14 +50,17 @@ public class Blob extends GitObject {
         content = Files.readAllBytes(filePath);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public String getPath() {
         return path;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public LightBlob getLightBlob() {
         return new LightBlob(path, getSHA());
     }
 
+    @SuppressWarnings("WeakerAccess")
     public byte[] getContent() {
         return content;
     }

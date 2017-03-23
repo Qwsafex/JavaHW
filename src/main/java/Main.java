@@ -59,7 +59,7 @@ public class Main {
                         System.out.print(record.toString());
                         System.out.println("---------------------");
                     }
-                } catch (IOException | VCSFilesCorruptedException | RefNotFoundException e) {
+                } catch (IOException | VCSFilesCorruptedException e) {
                     System.out.println(e.getMessage());
                 }
                 break;
@@ -67,7 +67,7 @@ public class Main {
             case "checkout": {
                 try {
                     vcs.checkout(args[1]);
-                } catch (IOException | BranchNotFoundException | VCSFilesCorruptedException | RefNotFoundException e) {
+                } catch (IOException | BranchNotFoundException | VCSFilesCorruptedException e) {
                     System.out.println(e.getMessage());
                 }
                 break;

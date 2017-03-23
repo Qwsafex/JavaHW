@@ -1,5 +1,6 @@
 package vcs;
 
+@SuppressWarnings("WeakerAccess")
 public class VCSRef {
     private static final String REF_PREFIX = "ref: ";
     private String name;

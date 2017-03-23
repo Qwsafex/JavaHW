@@ -13,6 +13,7 @@ public class Commit extends GitObject{
     private final List<LightBlob> blobs;
     private final String prevCommit;
 
+    @SuppressWarnings("WeakerAccess")
     public Commit(String message, List<LightBlob> blobs, String prevCommit) {
         this.message = message;
         this.blobs = blobs;
@@ -35,6 +36,7 @@ public class Commit extends GitObject{
 
     }
 
+    @SuppressWarnings({"StringBufferReplaceableByString", "StringConcatenationInsideStringBufferAppend"})
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
@@ -49,14 +51,17 @@ public class Commit extends GitObject{
         return result.toString();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public String getPrevCommit() {
         return prevCommit;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public List<LightBlob> getBlobs() {
         return blobs;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public String getMessage() {
         return message;
     }
