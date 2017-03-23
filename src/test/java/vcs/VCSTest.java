@@ -103,7 +103,7 @@ public class VCSTest {
 
      */
     @Test
-    public void branchesCheckout() throws Exception, NothingToCommitException {
+    public void branchesCheckout() throws Exception, NothingToCommitException, BranchAlreadyExistsException {
         deleteRecursive(TestFile.TEST_DIR);
         deleteRecursive(VCS_PATH);
         VCS vcs = new VCS();
