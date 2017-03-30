@@ -7,7 +7,15 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Main {
+    private static void jack(String kek){
+        kek = "jack";
+    }
     public static void main(String[] args) {
+        String kek = "kek";
+        jack(kek);
+        System.out.print(kek);
+    }
+    public static void kek(String[] args) {
         for (String arg : args) {
             System.out.println(arg);
         }
