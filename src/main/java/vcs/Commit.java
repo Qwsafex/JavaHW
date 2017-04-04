@@ -23,4 +23,12 @@ public class Commit {
     public CommitSHARef getPrevCommit() {
         return prevCommit;
     }
+
+    public CommitRef getRef() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static Commit get(String revision) {
+        throw new UnsupportedOperationException();
+    }
 }

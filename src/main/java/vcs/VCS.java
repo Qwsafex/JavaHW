@@ -21,6 +21,21 @@ public class VCS {
         throw new UnsupportedOperationException();
     }
 
+    public void checkout(String revision) throws CheckoutStagedNotEmpty {
+        if (!staged.empty()) {
+            throw new CheckoutStagedNotEmpty();
+        }
+        if (Branches.exists(revision)) {
+            Branch newBranch = Branches.get(revision);
+            head = newBranch;
+            index = RepoState.getFromCommit(newBranch.getCommit());
+        }
+        else {
+            Commit headCommit = Commit.get(revision);
+            head = headCommit.getRef();
+            index = RepoState.getFromCommit(headCommit);
+        }
+    }
     public void add(String pathString) {
         Path filePath = Paths.get(pathString);
         if (Files.isDirectory(filePath)) {
@@ -29,7 +44,9 @@ public class VCS {
         ContentfulBlob newBlob = new ContentfulBlob(filePath);
         staged.add(newBlob.getContentlessBlob());
     }
-
+    public void rm(String pathString) {
+        throw new UnsupportedOperationException();
+    }
     public void createBranch(String branchName) {
         Branches.create(branchName);
     }
@@ -51,7 +68,7 @@ public class VCS {
         CommitRef currentCommitRef = head;
         List<String> result = new ArrayList<>();
         while (currentCommitRef != null) {
-            Commit currentCommit = currentCommitRef.getCommit()
+            Commit currentCommit = currentCommitRef.getCommit();
             result.add(currentCommit.toString());
             currentCommitRef = currentCommit.getPrevCommit();
         }
@@ -70,7 +87,7 @@ public class VCS {
         for (ContentlessBlob newBlob : mergingBlobs) {
             if (curBlobs.containsKey(newBlob.getPath())) {
                 ContentlessBlob oldBlob = curBlobs.get(newBlob.getPath());
-                if (!oldBlob.getSHA().equals(newBlob.getSHA()) {
+                if (!oldBlob.getSHA().equals(newBlob.getSHA())) {
                     // TODO: Bad from design point of view
                     mergeBlobs(oldBlob, newBlob);
                 }
