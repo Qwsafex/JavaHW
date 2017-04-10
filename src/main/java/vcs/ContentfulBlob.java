@@ -18,7 +18,7 @@ public class ContentfulBlob implements Blob{
 
     @Override
     public String getPath() {
-        throw new UnsupportedOperationException();
+        return path;
     }
 
     @Override
@@ -28,6 +28,6 @@ public class ContentfulBlob implements Blob{
 
     @Override
     public ContentlessBlob getContentlessBlob() {
-        throw new UnsupportedOperationException();
+        return new ContentlessBlob(path, getSHA());
     }
 }

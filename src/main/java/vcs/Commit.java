@@ -25,7 +25,11 @@ public class Commit {
     }
 
     public CommitRef getRef() {
-        throw new UnsupportedOperationException();
+        return new CommitSHARef(getSHA());
+
+    }
+
+    private String getSHA() { throw new UnsupportedOperationException();
     }
 
     public static Commit get(String revision) {

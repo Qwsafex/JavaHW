@@ -4,6 +4,11 @@ public class ContentlessBlob implements Blob{
     private String path;
     private BlobSHARef blobRef;
 
+    public ContentlessBlob(String path, BlobSHARef ref) {
+        this.path = path;
+        this.blobRef = ref;
+    }
+
     @Override
     public BlobSHARef getSHA() {
         throw new UnsupportedOperationException();

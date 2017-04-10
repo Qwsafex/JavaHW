@@ -12,12 +12,12 @@ public class Branch implements CommitRef {
 
     @Override
     public CommitSHARef getCommitSHA() {
-        throw new UnsupportedOperationException();
+        return headCommit.getCommitSHA();
     }
 
     @Override
     public Commit getCommit() {
-        throw new UnsupportedOperationException();
+        return headCommit.getCommit();
     }
 
     @Override
