@@ -1,5 +1,6 @@
 package vcs;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +33,7 @@ public class VCS {
         }
         else {
             Commit headCommit = Commit.get(revision);
-            head = headCommit.getRef();
+            head = headCommit.getSHARef();
             index = RepoState.getFromCommit(headCommit);
         }
     }
@@ -47,10 +48,13 @@ public class VCS {
     public void rm(String pathString) {
         throw new UnsupportedOperationException();
     }
-    public void createBranch(String branchName) {
-        Branches.create(branchName);
+    public void createBranch(String branchName) throws IOException {
+        Branches.create(branchName, head.getCommitSHA());
     }
-    public void deleteBranch(String branchName) {
+    public void deleteBranch(String branchName) throws BranchNotFoundException, IOException {
+        if (head.equals(Branches.get(branchName))) {
+            throw new BranchNotFoundException(branchName);
+        }
         Branches.delete(branchName);
     }
     public void commit(String commitMessage) throws NothingToCommitException, EmptyCommitMessageException {

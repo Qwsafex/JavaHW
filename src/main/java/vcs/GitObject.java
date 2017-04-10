@@ -1,5 +1,7 @@
 package vcs;
 
-public interface GitObject {
+import java.io.Serializable;
+
+public interface GitObject extends Serializable{
     SHARef getSHARef();
 }

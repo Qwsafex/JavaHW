@@ -21,4 +21,9 @@ public class CommitSHARef implements CommitRef{
     public CommitRef addCommitAfter(Commit commit) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String toString() {
+        return commitSHA;
+    }
 }

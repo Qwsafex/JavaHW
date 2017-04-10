@@ -24,15 +24,13 @@ public class Commit {
         return prevCommit;
     }
 
-    public CommitRef getRef() {
-        return new CommitSHARef(getSHA());
-
-    }
-
-    private String getSHA() { throw new UnsupportedOperationException();
-    }
+    private String getSHA() { throw new UnsupportedOperationException();}
 
     public static Commit get(String revision) {
         throw new UnsupportedOperationException();
+    }
+
+    public CommitSHARef getSHARef() {
+        return new CommitSHARef(getSHA());
     }
 }

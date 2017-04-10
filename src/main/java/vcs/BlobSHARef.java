@@ -1,6 +1,11 @@
 package vcs;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class BlobSHARef implements SHARef {
+    private static final Path BLOB_DIR = Paths.get("blobs");
     private String blobSHA;
 
     @Override
@@ -20,7 +25,7 @@ public class BlobSHARef implements SHARef {
     }
 
     @Override
-    public GitObject getObject() {
-        throw new UnsupportedOperationException();
+    public GitObject getObject() throws IOException, ClassNotFoundException {
+        return (GitObject) VCSFiles.readObject(BLOB_DIR.resolve(blobSHA));
     }
 }

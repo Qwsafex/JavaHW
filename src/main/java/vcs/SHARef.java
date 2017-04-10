@@ -1,5 +1,7 @@
 package vcs;
 
+import java.io.IOException;
+
 public interface SHARef {
-    GitObject getObject();
+    GitObject getObject() throws IOException, ClassNotFoundException;
 }
