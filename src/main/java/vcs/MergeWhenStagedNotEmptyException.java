@@ -1,4 +1,4 @@
 package vcs;
 
-public class MergeWhenStagedNotEmptyException extends VCSException {
+class MergeWhenStagedNotEmptyException extends VCSException {
 }

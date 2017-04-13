@@ -1,12 +1,13 @@
 package vcs;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-public class BlobSHARef implements SHARef {
-    private static final Path BLOB_DIR = Paths.get("blobs");
+class BlobSHARef implements SHARef {
     private String blobSHA;
+
+    BlobSHARef(String blobSHA) {
+        this.blobSHA = blobSHA;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -26,6 +27,11 @@ public class BlobSHARef implements SHARef {
 
     @Override
     public GitObject getObject() throws IOException, ClassNotFoundException {
-        return (GitObject) VCSFiles.readObject(BLOB_DIR.resolve(blobSHA));
+        return (GitObject) VCSFiles.readObject(Blob.BLOB_DIR.resolve(blobSHA));
+    }
+
+    @Override
+    public String toString() {
+        return blobSHA;
     }
 }

@@ -1,9 +1,7 @@
 package vcs;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,19 +10,26 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class VCS {
+    private static final String INDEX_FILENAME = "index";
+    private static final String STAGED_FILENAME = "staged";
+    private static final String HEAD_FILENAME = "HEAD";
+    private static final byte[] MERGED_FILES_SEPARATOR = "\n===============\n".getBytes();
     private CommitRef head;
     private RepoState index;
     private RepoState staged;
 
     // TODO: take String[] as args and check them
 
-    public VCS(){
-        throw new UnsupportedOperationException();
+    public VCS() throws IOException, ClassNotFoundException {
+        index = new RepoState(INDEX_FILENAME);
+        staged = new RepoState(STAGED_FILENAME);
+        head = CommitRef.readRef(HEAD_FILENAME);
     }
 
-    public void checkout(String revision) throws CheckoutStagedNotEmpty {
+    public void checkout(String revision) throws CheckoutStagedNotEmptyException, VCSFilesCorruptedException,
+            BranchNotFoundException, IOException, ClassNotFoundException {
         if (!staged.empty()) {
-            throw new CheckoutStagedNotEmpty();
+            throw new CheckoutStagedNotEmptyException();
         }
         if (Branches.exists(revision)) {
             Branch newBranch = Branches.get(revision);
@@ -36,8 +41,9 @@ public class VCS {
             head = headCommit.getSHARef();
             index = RepoState.getFromCommit(headCommit);
         }
+        head.writeToDisk();
     }
-    public void add(String pathString) {
+    public void add(String pathString) throws IOException {
         Path filePath = Paths.get(pathString);
         if (Files.isDirectory(filePath)) {
             throw new UnsupportedOperationException();
@@ -45,13 +51,10 @@ public class VCS {
         ContentfulBlob newBlob = new ContentfulBlob(filePath);
         staged.add(newBlob.getContentlessBlob());
     }
-    public void rm(String pathString) {
-        throw new UnsupportedOperationException();
-    }
     public void createBranch(String branchName) throws IOException {
         Branches.create(branchName, head.getCommitSHA());
     }
-    public void deleteBranch(String branchName) throws BranchNotFoundException, IOException {
+    public void deleteBranch(String branchName) throws BranchNotFoundException, IOException, VCSFilesCorruptedException {
         if (head.equals(Branches.get(branchName))) {
             throw new BranchNotFoundException(branchName);
         }
@@ -68,7 +71,7 @@ public class VCS {
         Commit commit = new Commit(commitMessage, staged.getFiles(), head.getCommitSHA());
         head = head.addCommitAfter(commit);
     }
-    public List<String> log() {
+    public List<String> log() throws IOException, ClassNotFoundException {
         CommitRef currentCommitRef = head;
         List<String> result = new ArrayList<>();
         while (currentCommitRef != null) {
@@ -79,7 +82,8 @@ public class VCS {
         Collections.reverse(result);
         return result;
     }
-    public List<String> merge(String branchName) throws MergeWhenStagedNotEmptyException {
+    public List<String> merge(String branchName) throws MergeWhenStagedNotEmptyException, VCSFilesCorruptedException,
+            BranchNotFoundException, IOException, ClassNotFoundException {
         if (!staged.empty()) {
             throw new MergeWhenStagedNotEmptyException();
         }
@@ -91,7 +95,7 @@ public class VCS {
         for (ContentlessBlob newBlob : mergingBlobs) {
             if (curBlobs.containsKey(newBlob.getPath())) {
                 ContentlessBlob oldBlob = curBlobs.get(newBlob.getPath());
-                if (!oldBlob.getSHA().equals(newBlob.getSHA())) {
+                if (!oldBlob.getSHARef().equals(newBlob.getSHARef())) {
                     // TODO: Bad from design point of view
                     mergeBlobs(oldBlob, newBlob);
                 }
@@ -104,7 +108,11 @@ public class VCS {
         return null;
     }
 
-    private void mergeBlobs(ContentlessBlob oldBlob, ContentlessBlob newBlob) {
-        throw new UnsupportedOperationException();
+    private void mergeBlobs(ContentlessBlob oldBlob, ContentlessBlob newBlob) throws IOException, ClassNotFoundException {
+        // TODO: looks not right
+        Path path = Paths.get(oldBlob.getPath());
+        Files.write(path, oldBlob.getContentfulBlob().getContent());
+        Files.write(path, MERGED_FILES_SEPARATOR, StandardOpenOption.APPEND);
+        Files.write(path, newBlob.getContentfulBlob().getContent(), StandardOpenOption.APPEND);
     }
 }

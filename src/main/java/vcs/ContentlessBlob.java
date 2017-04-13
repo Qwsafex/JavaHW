@@ -1,27 +1,35 @@
 package vcs;
 
-public class ContentlessBlob implements Blob{
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+
+class ContentlessBlob implements Blob{
+    @NotNull
     private String path;
+    @NotNull
     private BlobSHARef blobRef;
 
-    public ContentlessBlob(String path, BlobSHARef ref) {
+    ContentlessBlob(@NotNull String path, @NotNull BlobSHARef ref) {
+
         this.path = path;
         this.blobRef = ref;
     }
 
     @Override
-    public BlobSHARef getSHA() {
-        throw new UnsupportedOperationException();
+    public BlobSHARef getSHARef() {
+        return blobRef;
     }
 
+    @NotNull
     @Override
     public String getPath() {
-        throw new UnsupportedOperationException();
+        return path;
     }
 
     @Override
-    public ContentfulBlob getContentfulBlob() {
-        throw new UnsupportedOperationException();
+    public ContentfulBlob getContentfulBlob() throws IOException, ClassNotFoundException {
+        return (ContentfulBlob) VCSFiles.readObject(BLOB_DIR.resolve(blobRef.toString()));
     }
 
     @Override
@@ -31,20 +39,19 @@ public class ContentlessBlob implements Blob{
 
         ContentlessBlob that = (ContentlessBlob) o;
 
-        if (path != null ? !path.equals(that.path) : that.path != null) return false;
-        return blobRef != null ? blobRef.equals(that.blobRef) : that.blobRef == null;
+        return blobRef.equals(that.blobRef);
 
     }
 
     @Override
     public int hashCode() {
-        int result = path != null ? path.hashCode() : 0;
-        result = 31 * result + (blobRef != null ? blobRef.hashCode() : 0);
+        int result = path.hashCode();
+        result = 31 * result + blobRef.hashCode();
         return result;
     }
 
     @Override
     public ContentlessBlob getContentlessBlob() {
-        throw new UnsupportedOperationException();
+        return this;
     }
 }

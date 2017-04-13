@@ -1,4 +1,4 @@
 package vcs;
 
-public class EmptyCommitMessageException extends VCSException {
+class EmptyCommitMessageException extends VCSException {
 }

@@ -5,13 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class VCSFiles {
+class VCSFiles {
     private static final Path VCS_DIR = Paths.get("vcs");
     static void delete(Path path) throws IOException {
         Files.delete(VCS_DIR.resolve(path));
     }
 
-    public static void create(Path path) throws IOException {
+    static void create(Path path) throws IOException {
         Files.createFile(path);
     }
 
@@ -19,11 +19,11 @@ public class VCSFiles {
         Files.write(VCS_DIR.resolve(path), s.getBytes());
     }
 
-    public static boolean exists(Path path) {
+    static boolean exists(Path path) {
         return Files.exists(VCS_DIR.resolve(path));
     }
 
-    public static void writeObject(Path path, Serializable object) throws IOException {
+    static void writeObject(Path path, Serializable object) throws IOException {
         FileOutputStream outStream = new FileOutputStream(path.toFile());
         ObjectOutputStream objOutStream = new ObjectOutputStream(outStream);
         objOutStream.writeObject(object);
@@ -31,12 +31,20 @@ public class VCSFiles {
         outStream.close();
     }
 
-    public static Object readObject(Path path) throws IOException, ClassNotFoundException {
+    static Object readObject(Path path) throws IOException, ClassNotFoundException {
         FileInputStream inStream = new FileInputStream(path.toFile());
         ObjectInputStream objInStream = new ObjectInputStream(inStream);
         Object object = objInStream.readObject();
         objInStream.close();
         inStream.close();
         return object;
+    }
+
+    public static Path getVCSPath(String relativePath) {
+        return VCS_DIR.resolve(relativePath);
+    }
+
+    public static void appendToFile(String s) {
+        throw new UnsupportedOperationException();
     }
 }

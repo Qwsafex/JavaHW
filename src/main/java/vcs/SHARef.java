@@ -2,6 +2,7 @@ package vcs;
 
 import java.io.IOException;
 
-public interface SHARef {
+interface SHARef {
+    @SuppressWarnings("unused")
     GitObject getObject() throws IOException, ClassNotFoundException;
 }

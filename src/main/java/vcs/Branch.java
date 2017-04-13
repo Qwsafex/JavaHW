@@ -1,13 +1,14 @@
 package vcs;
 
+import java.io.IOException;
 import java.io.Serializable;
 
-public class Branch implements CommitRef, Serializable {
+class Branch implements CommitRef, Serializable {
     private CommitSHARef headCommit;
     private String name;
 
 
-    public Branch(String name, CommitSHARef headCommit) {
+    Branch(String name, CommitSHARef headCommit) {
         this.name = name;
         this.headCommit = headCommit;
     }
@@ -34,19 +35,25 @@ public class Branch implements CommitRef, Serializable {
     }
 
     @Override
-    public Commit getCommit() {
+    public Commit getCommit() throws IOException, ClassNotFoundException {
         return headCommit.getCommit();
     }
 
     /**
      *
-     * @param commit
+     * @param commit to be added after
      * @return new head
      */
     @Override
     public CommitRef addCommitAfter(Commit commit) {
-        headCommit = commit.getSHARef();
+        headCommit =  commit.getSHARef();
+        writeToDisk();
         return this;
+    }
+
+    @Override
+    public void writeToDisk() {
+        throw new UnsupportedOperationException();
     }
 
 }

@@ -5,7 +5,4 @@ package vcs;
  */
 public class VCSFilesCorruptedException extends VCSException {
     VCSFilesCorruptedException(){}
-    VCSFilesCorruptedException(String s) {
-        super(s);
-    }
 }

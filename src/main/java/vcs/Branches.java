@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 
 class Branches {
     private static final Path BRANCHES_DIR = Paths.get("branches");
-    public static boolean exists(String branchName) {
+    static boolean exists(String branchName) {
         return VCSFiles.exists(getPath(branchName));
     }
     static void create(String branchName, CommitSHARef headCommit) throws IOException {
