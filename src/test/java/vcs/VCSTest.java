@@ -53,16 +53,15 @@ public class VCSTest {
         List<TestFile> files = Arrays.asList(A, B, C);
         List<String> commitMessages = new ArrayList<>();
         commitMessages.add(INITIAL_MSG);
-        for (int i = 0; i < files.size(); i++) {
-            TestFile cur = files.get(i);
+        for (TestFile cur : files) {
             cur.create();
             vcs.add(cur.getPath());
-            String commitMessage = "add_" + cur.getPath().toString();
+            String commitMessage = "add_" + cur.getPath();
             vcs.commit(commitMessage);
             commitMessages.add(commitMessage);
 
             assertArrayEquals(commitMessages.toArray(),
-                    vcs.log().stream().map(commit -> commit.getMessage()).collect(Collectors.toList()).toArray());
+                    vcs.log().toArray());
         }
     }
 
@@ -118,12 +117,12 @@ public class VCSTest {
             cur.create();
             vcs.checkout(branch);
             vcs.add(cur.getPath());
-            String commitMessage = "add_" + cur.getPath().toString();
+            String commitMessage = "add_" + cur.getPath();
             vcs.commit(commitMessage);
-            List<Commit> log = vcs.log();
+            List<String> log = vcs.log();
             assertEquals(2, log.size());
-            assertEquals(INITIAL_MSG, log.get(0).getMessage());
-            assertEquals(commitMessage, log.get(1).getMessage());
+            assertEquals(INITIAL_MSG, log.get(0));
+            assertEquals(commitMessage, log.get(1));
         }
         vcs.checkout(MASTER_BRANCH);
         for (TestFile file : files) {
@@ -154,16 +153,16 @@ public class VCSTest {
 }
 
 class TestFile {
-    public static final Path TEST_DIR = Paths.get("testXX/");
+    static final Path TEST_DIR = Paths.get("testXX/");
 
     private String content;
     private Path path;
 
-    public TestFile(String path, String content){
+    TestFile(String path, String content){
         this.content = content;
         this.path = TEST_DIR.resolve(path);
     }
-    public void create() throws IOException {
+    void create() throws IOException {
         Path parent = path.getParent();
         if (parent != null && Files.notExists(parent)) {
             Files.createDirectories(parent);
@@ -173,15 +172,15 @@ class TestFile {
         }
         Files.write(path, content.getBytes());
     }
-    public void remove() throws IOException {
+    void remove() throws IOException {
         Files.delete(path);
     }
-    public boolean check() throws IOException {
+    boolean check() throws IOException {
         return Files.exists(path) &&
                 Arrays.toString(Files.readAllBytes(path)).equals(content);
     }
 
-    public Path getPath() {
-        return path;
+    String getPath() {
+        return path.toString();
     }
 }

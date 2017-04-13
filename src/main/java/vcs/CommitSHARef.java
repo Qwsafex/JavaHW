@@ -33,10 +33,6 @@ class CommitSHARef implements CommitRef, SHARef{
         return commit.getSHARef();
     }
 
-    @Override
-    public void writeToDisk() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public String toString() {

@@ -45,15 +45,14 @@ class Branch implements CommitRef, Serializable {
      * @return new head
      */
     @Override
-    public CommitRef addCommitAfter(Commit commit) {
+    public CommitRef addCommitAfter(Commit commit) throws IOException {
         headCommit =  commit.getSHARef();
         writeToDisk();
         return this;
     }
 
-    @Override
-    public void writeToDisk() {
-        throw new UnsupportedOperationException();
+    public void writeToDisk() throws IOException {
+        VCSFiles.writeObject(Branches.BRANCHES_DIR.resolve(name), this);
     }
 
 }

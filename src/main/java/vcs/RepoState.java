@@ -21,9 +21,10 @@ class RepoState {
             files = (HashSet<ContentlessBlob>) VCSFiles.readObject(filePath);
         }
         else {
+            files = new HashSet<>();
             VCSFiles.create(filePath);
+            VCSFiles.writeObject(filePath, files);
         }
-        files = new HashSet<>();
     }
 
     void add(ContentlessBlob blob) throws IOException {

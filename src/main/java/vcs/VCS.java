@@ -14,6 +14,7 @@ public class VCS {
     private static final String STAGED_FILENAME = "staged";
     private static final String HEAD_FILENAME = "HEAD";
     private static final byte[] MERGED_FILES_SEPARATOR = "\n===============\n".getBytes();
+    private static final String MASTER_BRANCH = "master";
     private CommitRef head;
     private RepoState index;
     private RepoState staged;
@@ -21,8 +22,15 @@ public class VCS {
     // TODO: take String[] as args and check them
 
     public VCS() throws IOException, ClassNotFoundException {
+        VCSFiles.init();
         index = new RepoState(INDEX_FILENAME);
         staged = new RepoState(STAGED_FILENAME);
+        Path headPath = Paths.get(HEAD_FILENAME);
+        if (!VCSFiles.exists(headPath)) {
+            VCSFiles.create(headPath);
+            Commit initial = new Commit("initial", new ArrayList<>(), null);
+            VCSFiles.writeObject(headPath, Branches.create(MASTER_BRANCH, initial.getSHARef()));
+        }
         head = CommitRef.readRef(HEAD_FILENAME);
     }
 
@@ -41,7 +49,7 @@ public class VCS {
             head = headCommit.getSHARef();
             index = RepoState.getFromCommit(headCommit);
         }
-        head.writeToDisk();
+        VCSFiles.writeObject(Paths.get(HEAD_FILENAME), head);
     }
     public void add(String pathString) throws IOException {
         Path filePath = Paths.get(pathString);
@@ -60,7 +68,7 @@ public class VCS {
         }
         Branches.delete(branchName);
     }
-    public void commit(String commitMessage) throws NothingToCommitException, EmptyCommitMessageException {
+    public void commit(String commitMessage) throws NothingToCommitException, EmptyCommitMessageException, IOException {
         if (commitMessage.isEmpty()) {
             throw new EmptyCommitMessageException();
         }

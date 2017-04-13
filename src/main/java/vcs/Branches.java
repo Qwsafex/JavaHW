@@ -5,14 +5,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 class Branches {
-    private static final Path BRANCHES_DIR = Paths.get("branches");
+    static final Path BRANCHES_DIR = Paths.get("branches");
     static boolean exists(String branchName) {
         return VCSFiles.exists(getPath(branchName));
     }
-    static void create(String branchName, CommitSHARef headCommit) throws IOException {
+    static Branch create(String branchName, CommitSHARef headCommit) throws IOException {
         Path branchPath = getPath(branchName);
         VCSFiles.create(branchPath);
-        VCSFiles.writeObject(branchPath, new Branch(branchName, headCommit));
+        Branch newBranch = new Branch(branchName, headCommit);
+        VCSFiles.writeObject(branchPath, newBranch);
+        return newBranch;
     }
     static void delete(String branchName) throws IOException, BranchNotFoundException {
         if (!exists(branchName)) {

@@ -15,11 +15,12 @@ public class Commit implements GitObject {
     private long time;
     private String message;
 
-    Commit(String message, List<ContentlessBlob> files, CommitSHARef prevCommit) {
+    Commit(String message, List<ContentlessBlob> files, CommitSHARef prevCommit) throws IOException {
         this.message = message;
         this.files = files;
         this.time = System.currentTimeMillis();
         this.prevCommit = prevCommit;
+        VCSFiles.writeObject(COMMIT_DIR.resolve(getSHA()), this);
     }
 
     @Override

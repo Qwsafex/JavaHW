@@ -1,36 +1,29 @@
 package console;
 
-import vcs.*;
+import vcs.NothingToCommitException;
+import vcs.VCS;
+import vcs.VCSException;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class Main {
-    private static void jack(String kek){
-        kek = "jack";
-    }
     public static void main(String[] args) {
-        String kek = "kek";
-        jack(kek);
-        System.out.print(kek);
-    }
-    public static void kek(String[] args) {
         for (String arg : args) {
             System.out.println(arg);
         }
         VCS vcs;
         try {
             vcs = new VCS();
-        } catch (IOException | VCSException e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return;
         }
         switch (args[0]) {
             case "add": {
                 try {
-                    vcs.add(Paths.get(args[1]));
-                } catch (IOException | VCSException e) {
+                    vcs.add(args[1]);
+                } catch (IOException e) {
                     System.out.println(e.getMessage());
                 }
                 break;
@@ -40,7 +33,7 @@ public class Main {
                     vcs.commit(args[1]);
                 } catch (NothingToCommitException e) {
                     System.out.println("Nothing to commit.");
-                } catch (IOException | VCSException e) {
+                } catch (VCSException | IOException e) {
                     System.out.println(e.getMessage());
                 }
                 break;
@@ -56,7 +49,7 @@ public class Main {
                 else {
                     try {
                         vcs.createBranch(args[1]);
-                    } catch (VCSException | IOException e) {
+                    } catch (IOException e) {
                         System.out.println(e.getMessage());
                     }
                 }
@@ -64,20 +57,22 @@ public class Main {
             }
             case "log": {
                 try {
-                    List<Commit> log = vcs.log();
-                    for (Commit record : log) {
-                        System.out.print(record.toString());
+                    List<String> log = vcs.log();
+                    for (String record : log) {
+                        System.out.print(record);
                         System.out.println("---------------------");
                     }
-                } catch (IOException | VCSFilesCorruptedException e) {
+                } catch (IOException e) {
                     System.out.println(e.getMessage());
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
                 break;
             }
             case "checkout": {
                 try {
                     vcs.checkout(args[1]);
-                } catch (IOException | BranchNotFoundException | VCSFilesCorruptedException e) {
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
                 break;
@@ -92,7 +87,7 @@ public class Main {
                         System.out.println("Following files conflict:");
                         conflicts.forEach(System.out::println);
                     }
-                } catch (VCSException | IOException e) {
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
             }
