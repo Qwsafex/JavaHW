@@ -1,5 +1,7 @@
 package vcs;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -7,15 +9,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-public class Commit implements GitObject {
+class Commit implements GitObject {
 
     private static final Path COMMIT_DIR = Paths.get("commits");
+    @NotNull
     private List<ContentlessBlob> files;
     private CommitSHARef prevCommit;
     private long time;
     private String message;
 
-    Commit(String message, List<ContentlessBlob> files, CommitSHARef prevCommit) throws IOException {
+    Commit(String message, @NotNull List<ContentlessBlob> files, CommitSHARef prevCommit) throws IOException {
         this.message = message;
         this.files = files;
         this.time = System.currentTimeMillis();
@@ -43,7 +46,7 @@ public class Commit implements GitObject {
         }
     }
 
-    public static Commit get(String revision) throws IOException, ClassNotFoundException {
+    static Commit get(String revision) throws IOException, ClassNotFoundException {
         return (Commit) VCSFiles.readObject(COMMIT_DIR.resolve(revision));
     }
 
@@ -52,6 +55,7 @@ public class Commit implements GitObject {
         return new CommitSHARef(getSHA());
     }
 
+    @NotNull
     List<ContentlessBlob> getFiles() {
         return files;
     }

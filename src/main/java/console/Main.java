@@ -1,5 +1,6 @@
 package console;
 
+import vcs.EmptyCommitMessageException;
 import vcs.NothingToCommitException;
 import vcs.VCS;
 import vcs.VCSException;
@@ -24,17 +25,15 @@ public class Main {
                 try {
                     vcs.add(args[1]);
                 } catch (IOException e) {
-                    System.out.println(e.getMessage());
+                    printException(e);
                 }
                 break;
             }
             case "commit": {
                 try {
                     vcs.commit(args[1]);
-                } catch (NothingToCommitException e) {
-                    System.out.println("Nothing to commit.");
-                } catch (VCSException | IOException e) {
-                    System.out.println(e.getMessage());
+                } catch (Exception e) {
+                    printException(e);
                 }
                 break;
             }
@@ -43,14 +42,14 @@ public class Main {
                     try {
                         vcs.deleteBranch(args[2]);
                     } catch (VCSException | IOException e) {
-                        System.out.println(e.getMessage());
+                        printException(e);
                     }
                 }
                 else {
                     try {
                         vcs.createBranch(args[1]);
                     } catch (IOException e) {
-                        System.out.println(e.getMessage());
+                        printException(e);
                     }
                 }
                 break;
@@ -62,10 +61,8 @@ public class Main {
                         System.out.print(record);
                         System.out.println("---------------------");
                     }
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                } catch (IOException | ClassNotFoundException e) {
+                    printException(e);
                 }
                 break;
             }
@@ -73,7 +70,7 @@ public class Main {
                 try {
                     vcs.checkout(args[1]);
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    printException(e);
                 }
                 break;
             }
@@ -88,9 +85,13 @@ public class Main {
                         conflicts.forEach(System.out::println);
                     }
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    printException(e);
                 }
             }
         }
+    }
+
+    private static void printException(Exception e) {
+        System.out.println(e.getClass().toString() + " " + e.getMessage());
     }
 }

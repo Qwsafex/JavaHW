@@ -32,9 +32,7 @@ class RepoState {
             return;
         }
         files.add(blob);
-        if (filePath != null) {
-            VCSFiles.writeObject(filePath, files);
-        }
+        flush();
     }
     @SuppressWarnings("unused")
     public void remove(ContentlessBlob blob) throws IOException {
@@ -42,17 +40,16 @@ class RepoState {
             return; // TODO: throw exception?
         }
         files.remove(blob);
-        if (filePath != null) {
-            VCSFiles.writeObject(filePath, files);
-        }
+        flush();
     }
 
     boolean empty() {
         return files.isEmpty();
     }
 
-    void updateWith(RepoState delta) {
+    void updateWith(RepoState delta) throws IOException {
         files.addAll(delta.getFiles());
+        flush();
     }
 
     List<ContentlessBlob> getFiles() {
@@ -60,14 +57,32 @@ class RepoState {
     }
 
     static RepoState getFromCommit(Commit commit) throws IOException, ClassNotFoundException {
+        System.out.println("getFromCommit-1");
         RepoState result = new RepoState();
         while (commit != null) {
+            System.out.println("getFromCommit-2");
             List<ContentlessBlob> blobs = commit.getFiles();
+            System.out.println("getFromCommit-3");
             for (ContentlessBlob blob : blobs) {
                 result.add(blob);
+            }
+            System.out.println("getFromCommit-4");
+            if (commit.getPrevCommit() == null) {
+                break;
             }
             commit = commit.getPrevCommit().getCommit();
         }
         return result;
+    }
+
+    void clear() throws IOException {
+        files.clear();
+        flush();
+    }
+
+    private void flush() throws IOException {
+        if (filePath != null) {
+            VCSFiles.writeObject(filePath, files);
+        }
     }
 }

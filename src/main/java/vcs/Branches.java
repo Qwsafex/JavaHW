@@ -1,5 +1,7 @@
 package vcs;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,6 +25,7 @@ class Branches {
         VCSFiles.delete(getPath(branchName));
     }
 
+    @NotNull
     static Branch get(String branchName) throws BranchNotFoundException, IOException, VCSFilesCorruptedException {
         if (!exists(branchName)) {
             throw new BranchNotFoundException(branchName);

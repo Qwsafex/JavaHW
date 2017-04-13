@@ -26,8 +26,14 @@ class VCSFiles {
     }
 
     public static void write(Path path, String s) throws IOException {
+        write(path, s.getBytes());
+    }
+    public static void write(Path path, byte[] bytes) throws IOException {
         path = VCS_DIR.resolve(path);
-        Files.write(path, s.getBytes());
+        if (!Files.exists(path.getParent())) {
+            Files.createDirectories(path.getParent());
+        }
+        Files.write(path, bytes);
     }
 
     static boolean exists(Path path) {

@@ -49,6 +49,13 @@ public class VCS {
             head = headCommit.getSHARef();
             index = RepoState.getFromCommit(headCommit);
         }
+        List<ContentlessBlob> indexFiles = index.getFiles();
+        System.out.println(indexFiles.size());
+        for (ContentlessBlob blob : indexFiles) {
+            System.out.println(blob.getPath());
+            byte[] content = blob.getContentfulBlob().getContent();
+            VCSFiles.write(Paths.get(blob.getPath()), content);
+        }
         VCSFiles.writeObject(Paths.get(HEAD_FILENAME), head);
     }
     public void add(String pathString) throws IOException {
@@ -76,6 +83,7 @@ public class VCS {
             throw new NothingToCommitException();
         }
         index.updateWith(staged);
+        staged.clear();
         Commit commit = new Commit(commitMessage, staged.getFiles(), head.getCommitSHA());
         head = head.addCommitAfter(commit);
     }
