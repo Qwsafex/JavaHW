@@ -1,5 +1,7 @@
 package vcs;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 
 class ContentfulBlob implements Blob{
     private String path;
+    @NotNull
     private byte[] content;
 
     private String blobSHA;
@@ -23,6 +26,7 @@ class ContentfulBlob implements Blob{
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-1 hashing algorithm not implemented!");
         }
+        VCSFiles.writeObject(BLOB_DIR.resolve(blobSHA), this);
     }
 
 
@@ -46,6 +50,7 @@ class ContentfulBlob implements Blob{
         return new ContentlessBlob(path, getSHARef());
     }
 
+    @NotNull
     byte[] getContent() {
         return content;
     }

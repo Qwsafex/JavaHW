@@ -2,10 +2,7 @@ package vcs;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,12 +46,11 @@ public class VCS {
             head = headCommit.getSHARef();
             index = RepoState.getFromCommit(headCommit);
         }
-        List<ContentlessBlob> indexFiles = index.getFiles();
-        System.out.println(indexFiles.size());
-        for (ContentlessBlob blob : indexFiles) {
-            System.out.println(blob.getPath());
-            byte[] content = blob.getContentfulBlob().getContent();
-            VCSFiles.write(Paths.get(blob.getPath()), content);
+        // TODO: move to method of RepoState
+        HashMap<String, ContentlessBlob> indexFiles = index.getFiles();
+        for (Map.Entry<String, ContentlessBlob> blob : indexFiles.entrySet()) {
+            byte[] content = blob.getValue().getContentfulBlob().getContent();
+            VCSFiles.writeToRoot(Paths.get(blob.getKey()), content);
         }
         VCSFiles.writeObject(Paths.get(HEAD_FILENAME), head);
     }
@@ -83,8 +79,8 @@ public class VCS {
             throw new NothingToCommitException();
         }
         index.updateWith(staged);
+        Commit commit = new Commit(commitMessage, staged.getFiles().values().stream().collect(Collectors.toList()), head.getCommitSHA());
         staged.clear();
-        Commit commit = new Commit(commitMessage, staged.getFiles(), head.getCommitSHA());
         head = head.addCommitAfter(commit);
     }
     public List<String> log() throws IOException, ClassNotFoundException {
@@ -106,8 +102,8 @@ public class VCS {
         Branch mergingBranch = Branches.get(branchName);
         RepoState curState = index;
         RepoState mergingState = RepoState.getFromCommit(mergingBranch.getCommit());
-        Map<String, ContentlessBlob> curBlobs = curState.getFiles().stream().collect(Collectors.toMap(ContentlessBlob::getPath, Function.identity()));
-        List<ContentlessBlob> mergingBlobs = mergingState.getFiles();
+        Map<String, ContentlessBlob> curBlobs = curState.getFiles();
+        List<ContentlessBlob> mergingBlobs = mergingState.getFiles().values().stream().collect(Collectors.toList());
         for (ContentlessBlob newBlob : mergingBlobs) {
             if (curBlobs.containsKey(newBlob.getPath())) {
                 ContentlessBlob oldBlob = curBlobs.get(newBlob.getPath());

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class VCSTest {
     private static final TestFile A = new TestFile("A.txt", "A text");
@@ -45,7 +46,7 @@ public class VCSTest {
 
      */
 
-//    @Test
+    @Test
     public void simpleLog() throws Exception, NothingToCommitException {
         deleteRecursive(VCS_PATH);
         deleteRecursive(TestFile.TEST_DIR);
@@ -60,8 +61,10 @@ public class VCSTest {
             vcs.commit(commitMessage);
             commitMessages.add(commitMessage);
 
-            assertArrayEquals(commitMessages.toArray(),
-                    vcs.log().toArray());
+            List<String> log = vcs.log();
+            for (int i = 0; i < commitMessages.size(); i++) {
+                compareMessages(commitMessages.get(i), log.get(i));
+            }
         }
     }
 
@@ -101,7 +104,7 @@ public class VCSTest {
      1111  cat C
 
      */
-//    @Test
+    @Test
     public void branchesCheckout() throws Exception, NothingToCommitException, BranchAlreadyExistsException {
         deleteRecursive(TestFile.TEST_DIR);
         deleteRecursive(VCS_PATH);
@@ -121,8 +124,8 @@ public class VCSTest {
             vcs.commit(commitMessage);
             List<String> log = vcs.log();
             assertEquals(2, log.size());
-            assertEquals(INITIAL_MSG, log.get(0));
-            assertEquals(commitMessage, log.get(1));
+            compareMessages(INITIAL_MSG, log.get(0));
+            compareMessages(commitMessage, log.get(1));
         }
         vcs.checkout(MASTER_BRANCH);
         for (TestFile file : files) {
@@ -135,6 +138,10 @@ public class VCSTest {
             vcs.checkout(branch);
             cur.check();
         }
+    }
+
+    private void compareMessages(String handmadeMessage, String logMessage) {
+        assertTrue(logMessage.endsWith(handmadeMessage));
     }
 
     private void deleteRecursive(Path path) throws IOException {

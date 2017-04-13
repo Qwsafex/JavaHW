@@ -59,7 +59,7 @@ public class Main {
                     List<String> log = vcs.log();
                     for (String record : log) {
                         System.out.print(record);
-                        System.out.println("---------------------");
+                        System.out.println("\n---------------------\n");
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     printException(e);

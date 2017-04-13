@@ -29,11 +29,7 @@ class VCSFiles {
         write(path, s.getBytes());
     }
     public static void write(Path path, byte[] bytes) throws IOException {
-        path = VCS_DIR.resolve(path);
-        if (!Files.exists(path.getParent())) {
-            Files.createDirectories(path.getParent());
-        }
-        Files.write(path, bytes);
+        writeToRoot(VCS_DIR.resolve(path), bytes);
     }
 
     static boolean exists(Path path) {
@@ -63,4 +59,14 @@ class VCSFiles {
         return object;
     }
 
+    static void writeToRoot(Path path, byte[] content) throws IOException {
+        Path parentPath = path.getParent();
+        if (parentPath != null && !Files.exists(parentPath)) {
+            Files.createDirectories(parentPath);
+        }
+        if (!Files.exists(path)) {
+            Files.createFile(path);
+        }
+        Files.write(path, content);
+    }
 }

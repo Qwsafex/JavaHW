@@ -27,6 +27,7 @@ class ContentlessBlob implements Blob{
         return path;
     }
 
+    @NotNull
     @Override
     public ContentfulBlob getContentfulBlob() throws IOException, ClassNotFoundException {
         return (ContentfulBlob) VCSFiles.readObject(BLOB_DIR.resolve(blobRef.toString()));

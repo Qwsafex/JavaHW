@@ -28,7 +28,9 @@ class Commit implements GitObject {
 
     @Override
     public String toString() {
-        throw new UnsupportedOperationException();
+        @SuppressWarnings("StringBufferReplaceableByString") StringBuilder result = new StringBuilder(getSHA() + "\n");
+        result.append(message);
+        return result.toString();
     }
 
     CommitSHARef getPrevCommit() {
