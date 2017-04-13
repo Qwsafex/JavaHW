@@ -48,7 +48,7 @@ public class Main {
                 else {
                     try {
                         vcs.createBranch(args[1]);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         printException(e);
                     }
                 }

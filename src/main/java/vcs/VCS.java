@@ -102,7 +102,7 @@ public class VCS {
      * @throws BranchAlreadyExistsException if branchName already exists
      */
     public void createBranch(String branchName) throws IOException, BranchAlreadyExistsException {
-        Branches.create(branchName, head.getCommitSHA())
+        Branches.create(branchName, head.getCommitSHA());
     }
 
     /**
