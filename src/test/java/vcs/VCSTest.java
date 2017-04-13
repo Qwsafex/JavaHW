@@ -29,7 +29,6 @@ public class VCSTest {
     private static final Path VCS_PATH = Paths.get(".vcs/");
 
     /*
-
  2016  touch a
  2017  touch b
  2018  touch c
@@ -42,8 +41,6 @@ public class VCSTest {
  2025  vcs add c
  2026  vcs commit add_C
  2027  vcs log
-
-
      */
 
     @Test

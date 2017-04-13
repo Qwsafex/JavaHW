@@ -11,7 +11,10 @@ class Branches {
     static boolean exists(String branchName) {
         return VCSFiles.exists(getPath(branchName));
     }
-    static Branch create(String branchName, CommitSHARef headCommit) throws IOException {
+    static Branch create(String branchName, CommitSHARef headCommit) throws IOException, BranchAlreadyExistsException {
+        if (exists(branchName)) {
+            throw new BranchAlreadyExistsException(branchName);
+        }
         Path branchPath = getPath(branchName);
         VCSFiles.create(branchPath);
         Branch newBranch = new Branch(branchName, headCommit);
