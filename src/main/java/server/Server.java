@@ -44,11 +44,9 @@ public class Server {
                 if (selectionKey.isReadable()) {
                     SmallReadableMessage message = (SmallReadableMessage) selectionKey.attachment();
                     if (message.read()) {
-                        selectionKey.cancel();
                         SelectionKey newSelectionKey = selectionKey.channel().register(selector, SelectionKey.OP_WRITE);
                         newSelectionKey.attach(new SmallWritableMessage(message.getChannel(), queryProcessor.process(message.getData())));
                     }
-
                 }
                 if (selectionKey.isWritable()) {
                     WritableMessage message = (WritableMessage) selectionKey.attachment();

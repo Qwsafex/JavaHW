@@ -8,7 +8,8 @@ import java.io.IOException;
 public class ClientConsoleApp {
     public static void main(String[] args) throws IOException {
         String hostname = args[1];
-        /*int port = Integer.valueOf(args[2]);
+        /*
+        int port = Integer.valueOf(args[2]);
         Thread serverThread = new Thread(() -> {
             Server server = new Server();
             try {
@@ -18,7 +19,9 @@ public class ClientConsoleApp {
             }
         });
         serverThread.start();
-        */
+
+        //*/
+
         Client client = new Client();
         System.out.println("heh");
         client.connect(args[1], Integer.valueOf(args[2]));

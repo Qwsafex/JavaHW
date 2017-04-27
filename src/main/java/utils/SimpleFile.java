@@ -1,6 +1,8 @@
 package utils;
 
-public class SimpleFile {
+import java.io.Serializable;
+
+public class SimpleFile implements Serializable{
     public final String name;
     public final boolean isDirectory;
 

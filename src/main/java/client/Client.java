@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class Client {
-    private enum Command {LIST, GET}
+    public enum Query {LIST, GET}
 
     private final SocketChannel channel;
 
@@ -38,7 +38,7 @@ public class Client {
     }
 
     public List<SimpleFile> executeList(String path) throws IOException {
-        sendRequest(createSentData((byte) Command.LIST.ordinal(), path.getBytes()));
+        sendRequest(createSentData((byte) Query.LIST.ordinal(), path.getBytes()));
         byte[] response = getSmallResponse();
         ObjectInputStream objectStream = new ObjectInputStream(new ByteArrayInputStream(response));
         try {
@@ -52,7 +52,7 @@ public class Client {
 
 
     public String executeGet(String path) throws IOException {
-        sendRequest(createSentData((byte) Command.GET.ordinal(), path.getBytes()));
+        sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes()));
         return new String(getSmallResponse(), StandardCharsets.UTF_8);
     }
     private byte[] getSmallResponse() throws IOException {
@@ -83,8 +83,7 @@ public class Client {
     }
 
     private byte[] createSentData(byte first, byte[] rest) {
-        long size = Long.BYTES + 1 + rest.length;
-        return ArrayUtils.addAll(ByteBuffer.allocate(1 + Long.BYTES).putLong(size).put(first).array(), rest);
+        return ArrayUtils.addAll(ByteBuffer.allocate(1).put(first).array(), rest);
     }
 
 }
