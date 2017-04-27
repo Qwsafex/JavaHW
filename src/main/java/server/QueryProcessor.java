@@ -8,7 +8,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 class QueryProcessor {
     byte[] process(@NotNull byte[] data) throws IOException {
@@ -22,12 +25,11 @@ class QueryProcessor {
             case LIST: {
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
                 ObjectOutputStream objectStream = new ObjectOutputStream(byteStream);
-                ArrayList<SimpleFile> files = new ArrayList<>();
-                files.add(new SimpleFile("heh", false));
-                files.add(new SimpleFile("meh", true));
+                ArrayList<SimpleFile> files = new ArrayList<>(Files.list(Paths.get(path))
+                        .map(p -> new SimpleFile(p.toString(), Files.isDirectory(p))).collect(Collectors.toList()));
                 objectStream.writeObject(files);
                 objectStream.flush();
-                return byteStream.toByteArray();
+                return byteStream.toByteArray() ;
             }
             default: {
                 throw new UnsupportedOperationException();
