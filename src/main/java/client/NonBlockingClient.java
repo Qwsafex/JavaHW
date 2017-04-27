@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.nio.channels.NotYetConnectedException;
 import java.nio.channels.SocketChannel;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -59,7 +60,7 @@ public class NonBlockingClient implements Client{
 
     @NotNull
     @Override
-    public String executeGet(@NotNull String path) throws IOException {
+    public Path executeGet(@NotNull String path) throws IOException {
         sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes()));
         return getBigResponse().getFilename();
     }

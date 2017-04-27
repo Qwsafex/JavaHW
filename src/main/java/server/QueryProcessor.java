@@ -1,6 +1,6 @@
 package server;
 
-import client.NonBlockingClient.Query;
+import client.Client;
 import org.jetbrains.annotations.NotNull;
 import utils.GetResponse;
 import utils.ListResponse;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 class QueryProcessor {
     Response process(@NotNull byte[] data, FileSystem fileSystem) throws IOException {
-        Query queryType = Query.values()[data[0]];
+        Client.Query queryType = Client.Query.values()[data[0]];
         String path = new String(data, 1, data.length - 1, StandardCharsets.UTF_8);
 
         switch (queryType) {
