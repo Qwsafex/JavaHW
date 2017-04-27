@@ -17,7 +17,7 @@ import java.util.List;
  * Class that implements non-blocking FTP client.
  */
 
-public class NonBlockingClient implements Client{
+class NonBlockingClient implements Client{
 
     private final SocketChannel channel;
 
@@ -64,24 +64,27 @@ public class NonBlockingClient implements Client{
         sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes()));
         return getBigResponse().getPath();
     }
+
+    @NotNull
     private byte[] getSmallResponse() throws IOException {
         SmallReadableMessage message = new SmallReadableMessage(channel);
         getResponse(message);
         return message.getData();
     }
 
+    @NotNull
     private BigReadableMessage getBigResponse() throws IOException {
         BigReadableMessage message = new BigReadableMessage(channel);
         getResponse(message);
         return message;
     }
 
-    private void getResponse(ReadableMessage message) throws IOException {
+    private void getResponse(@NotNull ReadableMessage message) throws IOException {
         //noinspection StatementWithEmptyBody
         while (!message.read());
     }
 
-    private void sendRequest(byte[] data) throws IOException {
+    private void sendRequest(@NotNull byte[] data) throws IOException {
         //noinspection StatementWithEmptyBody
         if (!channel.isConnected()) {
             throw new NotYetConnectedException();
@@ -91,7 +94,8 @@ public class NonBlockingClient implements Client{
         while (!message.write());
     }
 
-    private byte[] createSentData(byte first, byte[] rest) {
+    @NotNull
+    private byte[] createSentData(byte first, @NotNull byte[] rest) {
         return ArrayUtils.addAll(ByteUtils.byteToBytes(first), rest);
     }
 

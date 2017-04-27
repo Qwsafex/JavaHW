@@ -13,9 +13,12 @@ import java.nio.channels.SocketChannel;
  */
 public class WritableMessage {
     private static final int BUFFER_SIZE = 4096;
+    @NotNull
     private final ByteBuffer buffer;
     private long leftSource;
+    @NotNull
     private SocketChannel channel;
+    @NotNull
     private InputStream source;
     WritableMessage(@NotNull SocketChannel channel, @NotNull InputStream source, long size) {
         this.leftSource = size;

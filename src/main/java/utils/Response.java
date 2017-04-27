@@ -1,5 +1,7 @@
 package utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
@@ -12,5 +14,5 @@ public interface Response {
      * @param channel channel to associate message with
      * @return message with this response
      */
-    WritableMessage generateMessage(SocketChannel channel) throws IOException;
+    WritableMessage generateMessage(@NotNull SocketChannel channel) throws IOException;
 }

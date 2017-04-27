@@ -1,5 +1,7 @@
 package utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -15,6 +17,7 @@ public class ByteUtils {
      * @return byte representation of given number
      */
     @SuppressWarnings("WeakerAccess")
+    @NotNull
     public static byte[] longToBytes(long x) {
         longBuffer.putLong(0, x);
         longBuffer.clear();
@@ -26,6 +29,7 @@ public class ByteUtils {
      * @param x byte to convert
      * @return byte array consisting of single given byte
      */
+    @NotNull
     public static byte[] byteToBytes(byte x) {
         byteBuffer.put(x);
         byteBuffer.clear();

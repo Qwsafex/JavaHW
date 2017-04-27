@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 class QueryProcessor {
-    Response process(@NotNull byte[] data, FileSystem fileSystem) throws IOException {
+    Response process(@NotNull byte[] data, @NotNull FileSystem fileSystem) throws IOException {
         Client.Query queryType = Client.Query.values()[data[0]];
         String path = new String(data, 1, data.length - 1, StandardCharsets.UTF_8);
 

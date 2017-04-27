@@ -20,11 +20,12 @@ public class SmallWritableMessage extends WritableMessage {
         System.out.println("SmallMessage of " + data.length + " bytes");
     }
 
-    private static long getSize(byte[] data) {
+    private static long getSize(@NotNull byte[] data) {
         return Long.BYTES + data.length;
     }
 
-    private static byte[] addHeader(byte[] data) {
+    @NotNull
+    private static byte[] addHeader(@NotNull byte[] data) {
         return ArrayUtils.addAll(ByteUtils.longToBytes(getSize(data)), data);
     }
 }

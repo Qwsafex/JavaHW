@@ -14,12 +14,13 @@ class BigWritableMessage extends WritableMessage {
         super(channel, createMessageInputStream(source), getSize(source));
     }
 
-    private static InputStream createMessageInputStream(InputStream source) throws IOException {
+    @NotNull
+    private static InputStream createMessageInputStream(@NotNull InputStream source) throws IOException {
         InputStream stream = new ByteArrayInputStream(ByteUtils.longToBytes(getSize(source)));
         return new SequenceInputStream(stream, source);
     }
 
-    private static long getSize(InputStream source) throws IOException {
+    private static long getSize(@NotNull InputStream source) throws IOException {
         return Long.BYTES + source.available();
     }
 }

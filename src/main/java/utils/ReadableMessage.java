@@ -12,13 +12,16 @@ import java.nio.channels.SocketChannel;
  */
 public class ReadableMessage {
     private static final int BUFFER_SIZE = 4096;
+    @NotNull
     private final OutputStream destination;
+    @NotNull
     private SocketChannel channel;
     private long size = 0;
     private int read = 0;
+    @NotNull
     private ByteBuffer buffer;
 
-    ReadableMessage(@NotNull SocketChannel channel, OutputStream destination) {
+    ReadableMessage(@NotNull SocketChannel channel, @NotNull OutputStream destination) {
         this.channel = channel;
         // TODO: add buffered
         this.destination = destination;
@@ -29,6 +32,7 @@ public class ReadableMessage {
      * Returns associated channel.
      * @return channel from which data is being read
      */
+    @NotNull
     public SocketChannel getChannel() {
         return channel;
     }
@@ -60,6 +64,7 @@ public class ReadableMessage {
         return read == size && !buffer.hasRemaining();
     }
 
+    @NotNull
     OutputStream getDestination() {
         return destination;
     }

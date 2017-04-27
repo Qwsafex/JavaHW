@@ -2,7 +2,6 @@ package utils;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -20,7 +19,7 @@ public class ListResponse implements Response {
     }
 
     @Override
-    public WritableMessage generateMessage(SocketChannel channel) {
+    public WritableMessage generateMessage(@NotNull SocketChannel channel) {
         return new SmallWritableMessage(channel, data);
     }
 }

@@ -1,5 +1,6 @@
 package server;
 
+import org.jetbrains.annotations.NotNull;
 import utils.SmallReadableMessage;
 import utils.WritableMessage;
 
@@ -20,7 +21,7 @@ class NonBlockingServer implements FTPServer {
     }
 
     @Override
-    public void run(String hostname, int port) throws IOException {
+    public void run(@NotNull String hostname, int port) throws IOException {
         FileSystem fileSystem = new FileSystem(root);
         System.out.println("run");
         Selector selector = Selector.open();
