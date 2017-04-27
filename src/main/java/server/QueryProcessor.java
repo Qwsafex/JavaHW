@@ -1,6 +1,6 @@
 package server;
 
-import client.Client.Query;
+import client.NonBlockingClient.Query;
 import org.jetbrains.annotations.NotNull;
 import utils.GetResponse;
 import utils.ListResponse;

@@ -1,92 +1,70 @@
 package client;
 
-import org.apache.commons.lang3.ArrayUtils;
-import utils.*;
+import org.jetbrains.annotations.NotNull;
+import utils.SimpleFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.InetSocketAddress;
-import java.nio.channels.NotYetConnectedException;
-import java.nio.channels.SocketChannel;
+import java.nio.file.Path;
 import java.util.List;
 
-public class Client {
-    public enum Query {LIST, GET}
+/**
+ * Interface of a simple FTP server.
+ */
 
-    private final SocketChannel channel;
-
-    @SuppressWarnings("WeakerAccess")
-    public Client() throws IOException {
-        channel = SocketChannel.open();
-        channel.configureBlocking(false);
+public interface Client {
+    /**
+     * Enum of all possible client queries.
+     */
+    enum Query {
+        /**
+         * Query to list all files in directory
+         */
+        LIST,
+        /**
+         * Query to download file.
+         */
+        GET
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public void connect(String hostname, int port) throws IOException {
-        System.out.println("connecting to " + hostname + ":" + port);
-        if (channel.isConnected()) return;
-        channel.connect(new InetSocketAddress(hostname, port));
+    /**
+     * Tries to establish connection with server hostname:port.
+     * @param hostname the hostname of server
+     * @param port the port number
+     * @throws IOException If some I/O error during connection occurs
+     */
+    void connect(@NotNull String hostname, int port) throws IOException;
 
-        //noinspection StatementWithEmptyBody
-        while(!channel.finishConnect()) {
-            //System.out.println("not connected");
-        }
-    }
-    @SuppressWarnings("WeakerAccess")
-    public void disconnect() throws IOException {
-        channel.close();
-    }
+    /**
+     * Closes connection with server.
+     * @throws IOException If an I/O error during connection close occurs
+     */
+    void disconnect() throws IOException;
 
-    @SuppressWarnings("WeakerAccess")
-    public List<SimpleFile> executeList(String path) throws IOException {
-        sendRequest(createSentData((byte) Query.LIST.ordinal(), path.getBytes()));
-        byte[] response = getSmallResponse();
-        ObjectInputStream objectStream = new ObjectInputStream(new ByteArrayInputStream(response));
-        try {
-            //noinspection unchecked
-            return (List<SimpleFile>) objectStream.readObject();
-        } catch (ClassNotFoundException e) {
-            // TODO: probably change to custom exception
-            throw new RuntimeException("server.Server fucked up!");
-        }
-    }
+    /**
+     * Return list of files located in the specified directory.
+     * @param path The path to the directory
+     * @return List with all files in the directory.
+     * @throws IOException If an I/O error occurs
+     */
+    @NotNull
+    List<SimpleFile> executeList(@NotNull String path) throws IOException;
 
+    /**
+     * Downloads file.
+     * @param path path to file on server
+     * @return path to downloaded file on client
+     * @throws IOException If an I/O error occurs
+     */
+    @NotNull
+    Path executeGet(@NotNull String path) throws IOException ;
 
-    @SuppressWarnings("WeakerAccess")
-    public String executeGet(String path) throws IOException {
-        sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes()));
-        return getBigResponse().getFilename();
+    /**
+     * Creates non-blocking FTP client.
+     * @return A new FTP client
+     * @throws IOException If an I/O error occurs
+     */
+    @NotNull
+    static Client getNonBlocking() throws IOException {
+        return new NonBlockingClient();
     }
-    private byte[] getSmallResponse() throws IOException {
-        SmallReadableMessage message = new SmallReadableMessage(channel);
-        getResponse(message);
-        return message.getData();
-    }
-
-    private BigReadableMessage getBigResponse() throws IOException {
-        BigReadableMessage message = new BigReadableMessage(channel);
-        getResponse(message);
-        return message;
-    }
-
-    private void getResponse(ReadableMessage message) throws IOException {
-        //noinspection StatementWithEmptyBody
-        while (!message.read());
-    }
-
-    private void sendRequest(byte[] data) throws IOException {
-        //noinspection StatementWithEmptyBody
-        if (!channel.isConnected()) {
-            throw new NotYetConnectedException();
-        }
-        WritableMessage message = new SmallWritableMessage(channel, data);
-        //noinspection StatementWithEmptyBody
-        while (!message.write());
-    }
-
-    private byte[] createSentData(byte first, byte[] rest) {
-        return ArrayUtils.addAll(ByteUtils.byteToBytes(first), rest);
-    }
-
 }
