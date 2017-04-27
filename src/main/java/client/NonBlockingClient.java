@@ -62,7 +62,7 @@ public class NonBlockingClient implements Client{
     @Override
     public Path executeGet(@NotNull String path) throws IOException {
         sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes()));
-        return getBigResponse().getFilename();
+        return getBigResponse().getPath();
     }
     private byte[] getSmallResponse() throws IOException {
         SmallReadableMessage message = new SmallReadableMessage(channel);

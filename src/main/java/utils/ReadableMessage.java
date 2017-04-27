@@ -7,6 +7,9 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+/**
+ * Object that can read message data from specified channel.
+ */
 public class ReadableMessage {
     private static final int BUFFER_SIZE = 4096;
     private final OutputStream destination;
@@ -22,10 +25,19 @@ public class ReadableMessage {
         buffer = ByteBuffer.allocate(BUFFER_SIZE);
     }
 
+    /**
+     * Returns associated channel.
+     * @return channel from which data is being read
+     */
     public SocketChannel getChannel() {
         return channel;
     }
 
+    /**
+     * Calls read() on associated channel
+     * @return whether there is data left to read
+     * @throws IOException If an I/O error occurs.
+     */
     public boolean read() throws IOException {
         if (read < 4) {
             read += channel.read(buffer);

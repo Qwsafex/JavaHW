@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+/**
+ * Object that can write message data to specified channel.
+ */
 public class WritableMessage {
     private static final int BUFFER_SIZE = 4096;
     private final ByteBuffer buffer;
@@ -24,7 +27,7 @@ public class WritableMessage {
     }
 
     /**
-     * Calls write() on underlying channel with remaining data. 
+     * Calls write() on associated channel with remaining data.
      * @return whether it has completed message writing
      */
     public boolean write() throws IOException {
