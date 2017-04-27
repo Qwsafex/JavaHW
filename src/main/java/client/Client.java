@@ -1,4 +1,7 @@
+package client;
+
 import org.apache.commons.lang3.ArrayUtils;
+import utils.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,7 +22,7 @@ public class Client {
         channel.configureBlocking(false);
     }
 
-    public void connnect(String hostname, int port) throws IOException {
+    public void connect(String hostname, int port) throws IOException {
         if (channel.isConnected()) return;
         channel.connect(new InetSocketAddress(hostname, port));
 
@@ -39,7 +42,7 @@ public class Client {
             return (List<SimpleFile>) objectStream.readObject();
         } catch (ClassNotFoundException e) {
             // TODO: probably change to custom exception
-            throw new RuntimeException("Server fucked up!");
+            throw new RuntimeException("server.Server fucked up!");
         }
     }
 
@@ -49,13 +52,13 @@ public class Client {
         return getBigResponse().getFilename();
     }
     private byte[] getSmallResponse() throws IOException {
-        SmallMessage message = new SmallMessage(channel);
+        SmallReadableMessage message = new SmallReadableMessage(channel);
         getResponse(message);
         return message.getData();
     }
 
-    private BigMessage getBigResponse() throws IOException {
-        BigMessage message = new BigMessage(channel);
+    private BigReadableMessage getBigResponse() throws IOException {
+        BigReadableMessage message = new BigReadableMessage(channel);
         getResponse(message);
         return message;
     }
@@ -65,12 +68,12 @@ public class Client {
         while (!message.read());
     }
 
-    private void sendRequest(byte[] data) {
+    private void sendRequest(byte[] data) throws IOException {
         //noinspection StatementWithEmptyBody
         if (!channel.isConnected()) {
             throw new NotYetConnectedException();
         }
-        WritableMessage message = new WritableMessage(channel, data);
+        WritableMessage message = new SmallWritableMessage(channel, data);
         //noinspection StatementWithEmptyBody
         while (!message.write());
     }

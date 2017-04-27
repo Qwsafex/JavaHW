@@ -1,3 +1,9 @@
+package server;
+
+import utils.SmallReadableMessage;
+import utils.SmallWritableMessage;
+import utils.WritableMessage;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
@@ -14,7 +20,7 @@ public class Server {
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         QueryProcessor queryProcessor = new QueryProcessor();
-        while (true) {
+        while (!Thread.interrupted()) {
             selector.selectNow();
             Iterator<SelectionKey> keyIterator = selector.selectedKeys().iterator();
             while (keyIterator.hasNext()) {
@@ -24,14 +30,14 @@ public class Server {
                     SocketChannel socketChannel = serverChannel.accept();
                     socketChannel.configureBlocking(false);
                     SelectionKey newSelectionKey = socketChannel.register(selector, SelectionKey.OP_READ);
-                    newSelectionKey.attach(new SmallMessage(socketChannel));
+                    newSelectionKey.attach(new SmallReadableMessage(socketChannel));
                 }
                 if (selectionKey.isReadable()) {
-                    SmallMessage message = (SmallMessage) selectionKey.attachment();
+                    SmallReadableMessage message = (SmallReadableMessage) selectionKey.attachment();
                     if (message.read()) {
                         selectionKey.cancel();
                         SelectionKey newSelectionKey = selectionKey.channel().register(selector, SelectionKey.OP_WRITE);
-                        newSelectionKey.attach(new WritableMessage(message.getChannel(), queryProcessor.process(message.getData())));
+                        newSelectionKey.attach(new SmallWritableMessage(message.getChannel(), queryProcessor.process(message.getData())));
                     }
 
                 }

@@ -1,4 +1,6 @@
-class SimpleFile {
+package utils;
+
+public class SimpleFile {
     public final String name;
     public final boolean isDirectory;
 

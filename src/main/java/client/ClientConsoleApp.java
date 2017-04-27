@@ -1,9 +1,13 @@
+package client;
+
+import utils.SimpleFile;
+
 import java.io.IOException;
 
-public class CLI {
+public class ClientConsoleApp {
     public static void main(String[] args) throws IOException {
         Client client = new Client();
-        client.connnect(args[1], Integer.valueOf(args[2]));
+        client.connect(args[1], Integer.valueOf(args[2]));
         switch (args[0]) {
             case "get": {
                 String filename = client.executeGet(args[3]);
