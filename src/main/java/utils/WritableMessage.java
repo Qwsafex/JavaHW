@@ -18,7 +18,7 @@ public class WritableMessage {
         this.channel = channel;
         this.source = source;
         this.buffer = ByteBuffer.allocate(BUFFER_SIZE);
-        this.buffer.clear();
+        this.buffer.limit(0);
     }
 
     /**
@@ -30,16 +30,10 @@ public class WritableMessage {
             channel.write(buffer);
             return false;
         }
-        else {
+        else if (source.available() > 0){
             buffer.clear();
+            buffer.limit(source.read(buffer.array()));
         }
-        if (source.available() == 0) {
-            return true;
-        }
-
-        //noinspection ResultOfMethodCallIgnored
-        source.read(buffer.array());
-        buffer.flip();
-        return false;
+        return source.available() == 0 && !buffer.hasRemaining();
     }
 }

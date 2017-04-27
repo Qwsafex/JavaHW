@@ -10,6 +10,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.NotYetConnectedException;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class Client {
@@ -23,11 +24,14 @@ public class Client {
     }
 
     public void connect(String hostname, int port) throws IOException {
+        System.out.println("connecting to " + hostname + ":" + port);
         if (channel.isConnected()) return;
         channel.connect(new InetSocketAddress(hostname, port));
 
         //noinspection StatementWithEmptyBody
-        while(channel.isConnectionPending());
+        while(!channel.finishConnect()) {
+            //System.out.println("not connected");
+        }
     }
     public void disconnect() throws IOException {
         channel.close();
@@ -49,7 +53,7 @@ public class Client {
 
     public String executeGet(String path) throws IOException {
         sendRequest(createSentData((byte) Command.GET.ordinal(), path.getBytes()));
-        return getBigResponse().getFilename();
+        return new String(getSmallResponse(), StandardCharsets.UTF_8);
     }
     private byte[] getSmallResponse() throws IOException {
         SmallReadableMessage message = new SmallReadableMessage(channel);
@@ -79,8 +83,8 @@ public class Client {
     }
 
     private byte[] createSentData(byte first, byte[] rest) {
-        long size = Long.BYTES + rest.length;
-        return ArrayUtils.addAll(ByteBuffer.allocate(4).putLong(size).put(first).array(), rest);
+        long size = Long.BYTES + 1 + rest.length;
+        return ArrayUtils.addAll(ByteBuffer.allocate(1 + Long.BYTES).putLong(size).put(first).array(), rest);
     }
 
 }

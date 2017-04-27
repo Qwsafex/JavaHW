@@ -29,16 +29,20 @@ public class ReadableMessage {
         if (read < 4) {
             read += channel.read(buffer);
             if (read >= 4) {
+                buffer.flip();
                 size = buffer.getLong();
+                buffer.flip();
             }
             else {
                 return false;
             }
         }
         channel.read(buffer);
+        buffer.flip();
         while (buffer.hasRemaining()) {
             destination.write(buffer.get());
         }
+        buffer.flip();
         return read == size;
     }
 

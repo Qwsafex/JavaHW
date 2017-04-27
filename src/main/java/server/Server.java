@@ -13,14 +13,23 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 public class Server {
-    void run(int port) throws IOException {
+    public void run(String hostname, int port) throws IOException {
+        System.out.println("run");
         Selector selector = Selector.open();
+        System.out.println("1");
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-        serverSocketChannel.bind(new InetSocketAddress(port));
+        System.out.println("2");
+        System.out.println("binded to " + hostname + ":" + port);
+        serverSocketChannel.bind(new InetSocketAddress(hostname, port));
+        System.out.println("3");
         serverSocketChannel.configureBlocking(false);
+        System.out.println("4");
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        System.out.println("5");
         QueryProcessor queryProcessor = new QueryProcessor();
-        while (!Thread.interrupted()) {
+        System.out.println("6");
+        while (true) {
+            //System.out.println("hey");
             selector.selectNow();
             Iterator<SelectionKey> keyIterator = selector.selectedKeys().iterator();
             while (keyIterator.hasNext()) {
