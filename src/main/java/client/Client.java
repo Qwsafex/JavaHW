@@ -53,7 +53,7 @@ public class Client {
 
     public String executeGet(String path) throws IOException {
         sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes()));
-        return new String(getSmallResponse(), StandardCharsets.UTF_8);
+        return getBigResponse().getFilename();
     }
     private byte[] getSmallResponse() throws IOException {
         SmallReadableMessage message = new SmallReadableMessage(channel);

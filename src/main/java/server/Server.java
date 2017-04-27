@@ -16,18 +16,12 @@ public class Server {
     public void run(String hostname, int port) throws IOException {
         System.out.println("run");
         Selector selector = Selector.open();
-        System.out.println("1");
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-        System.out.println("2");
         System.out.println("binded to " + hostname + ":" + port);
         serverSocketChannel.bind(new InetSocketAddress(hostname, port));
-        System.out.println("3");
         serverSocketChannel.configureBlocking(false);
-        System.out.println("4");
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-        System.out.println("5");
         QueryProcessor queryProcessor = new QueryProcessor();
-        System.out.println("6");
         while (true) {
             //System.out.println("hey");
             selector.selectNow();
@@ -45,7 +39,7 @@ public class Server {
                     SmallReadableMessage message = (SmallReadableMessage) selectionKey.attachment();
                     if (message.read()) {
                         SelectionKey newSelectionKey = selectionKey.channel().register(selector, SelectionKey.OP_WRITE);
-                        newSelectionKey.attach(new SmallWritableMessage(message.getChannel(), queryProcessor.process(message.getData())));
+                        newSelectionKey.attach(queryProcessor.process(message.getData()).generateMessage(message.getChannel()));
                     }
                 }
                 if (selectionKey.isWritable()) {

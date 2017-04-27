@@ -2,6 +2,9 @@ package server;
 
 import client.Client.Query;
 import org.jetbrains.annotations.NotNull;
+import utils.GetResponse;
+import utils.ListResponse;
+import utils.Response;
 import utils.SimpleFile;
 
 import java.io.ByteArrayOutputStream;
@@ -14,13 +17,13 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 class QueryProcessor {
-    byte[] process(@NotNull byte[] data) throws IOException {
+    Response process(@NotNull byte[] data) throws IOException {
         Query queryType = Query.values()[data[0]];
         String path = new String(data, 1, data.length - 1, StandardCharsets.UTF_8);
 
         switch (queryType) {
             case GET: {
-                return ("Hello, " + path).getBytes();
+                return new GetResponse(Paths.get(path));
             }
             case LIST: {
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -29,7 +32,7 @@ class QueryProcessor {
                         .map(p -> new SimpleFile(p.toString(), Files.isDirectory(p))).collect(Collectors.toList()));
                 objectStream.writeObject(files);
                 objectStream.flush();
-                return byteStream.toByteArray() ;
+                return new ListResponse(byteStream.toByteArray());
             }
             default: {
                 throw new UnsupportedOperationException();

@@ -11,10 +11,11 @@ import java.nio.channels.SocketChannel;
 public class WritableMessage {
     private static final int BUFFER_SIZE = 4096;
     private final ByteBuffer buffer;
-    private int position;
+    private long leftSource;
     private SocketChannel channel;
     private InputStream source;
-    public WritableMessage(@NotNull SocketChannel channel, @NotNull InputStream source) {
+    public WritableMessage(@NotNull SocketChannel channel, @NotNull InputStream source, long size) {
+        this.leftSource = size;
         this.channel = channel;
         this.source = source;
         this.buffer = ByteBuffer.allocate(BUFFER_SIZE);
@@ -30,10 +31,12 @@ public class WritableMessage {
             channel.write(buffer);
             return false;
         }
-        else if (source.available() > 0){
+        else if (leftSource > 0){
             buffer.clear();
-            buffer.limit(source.read(buffer.array()));
+            int read = source.read(buffer.array());
+            buffer.limit(read);
+            leftSource -= read;
         }
-        return source.available() == 0 && !buffer.hasRemaining();
+        return leftSource == 0 && !buffer.hasRemaining();
     }
 }

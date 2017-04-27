@@ -10,12 +10,15 @@ import java.nio.channels.SocketChannel;
 
 public class SmallWritableMessage extends WritableMessage {
     public SmallWritableMessage(@NotNull SocketChannel channel, @NotNull byte[] data) {
-        super(channel, new ByteArrayInputStream(addHeader(data)));
+        super(channel, new ByteArrayInputStream(addHeader(data)), getSize(data));
         System.out.println("SmallMessage of " + data.length + " bytes");
     }
 
+    private static long getSize(byte[] data) {
+        return Long.BYTES + data.length;
+    }
+
     private static byte[] addHeader(byte[] data) {
-        long size = Long.BYTES + data.length;
-        return ArrayUtils.addAll(ByteBuffer.allocate(Long.BYTES).putLong(size).array(), data);
+        return ArrayUtils.addAll(ByteUtils.longToBytes(getSize(data)), data);
     }
 }

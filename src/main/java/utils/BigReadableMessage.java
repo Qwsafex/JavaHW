@@ -12,7 +12,7 @@ public class BigReadableMessage extends ReadableMessage {
 
     public BigReadableMessage(@NotNull SocketChannel channel) throws IOException {
         super(channel, new KnownFileOutputStream(Files.createTempFile("dwnl", "").toFile()));
-        filename = ((KnownFileOutputStream) getDestination()).getFile().getName();
+        filename = ((KnownFileOutputStream) getDestination()).getFile().getAbsolutePath();
     }
 
 
