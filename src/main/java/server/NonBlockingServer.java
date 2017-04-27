@@ -12,14 +12,14 @@ import java.nio.channels.SocketChannel;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-public class Server {
+class NonBlockingServer implements FTPServer {
     private final Path root;
 
-    public Server(Path root) {
+    NonBlockingServer(Path root) {
         this.root = root;
     }
 
-    @SuppressWarnings("WeakerAccess")
+    @Override
     public void run(String hostname, int port) throws IOException {
         FileSystem fileSystem = new FileSystem(root);
         System.out.println("run");

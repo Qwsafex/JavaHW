@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Interface of a simple FTP server.
+ * Interface of a simple FTP client.
  */
 
 public interface Client {

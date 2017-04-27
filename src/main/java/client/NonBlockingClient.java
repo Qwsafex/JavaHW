@@ -53,7 +53,7 @@ public class NonBlockingClient implements Client{
             return (List<SimpleFile>) objectStream.readObject();
         } catch (ClassNotFoundException e) {
             // TODO: probably change to custom exception
-            throw new RuntimeException("server.Server fucked up!");
+            throw new RuntimeException("server.NonBlockingServer fucked up!");
         }
     }
 

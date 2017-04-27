@@ -7,7 +7,17 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+/**
+ * Console application providing start/stop methods for FTP server.
+ */
+
 public class ServerConsoleApp {
+    /**
+     * Main method.
+     * @param args command line args
+     * @throws IOException If an I/O error occurs
+     */
+
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
 
@@ -22,11 +32,11 @@ public class ServerConsoleApp {
                     String hostname = scanner.next();
                     int port = scanner.nextInt();
                     serverThread = new Thread(() -> {
-                        Server server = new Server(Paths.get("."));
+                        FTPServer server = FTPServer.getNonBlocking(Paths.get("."));
                         try {
                             server.run(hostname, port);
                         } catch (IOException e) {
-                            System.err.println("Server run failed: " + e.getMessage());
+                            System.err.println("NonBlockingServer run failed: " + e.getMessage());
                         }
                     });
                     serverThread.start();
@@ -34,7 +44,7 @@ public class ServerConsoleApp {
                 }
                 case "stop": {
                     if (serverThread == null) {
-                        System.err.println("Server not started!");
+                        System.err.println("NonBlockingServer not started!");
                     }
                     else {
                         serverThread.interrupt();
