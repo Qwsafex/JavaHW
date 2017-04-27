@@ -17,6 +17,7 @@ public class ReadableMessage {
 
     ReadableMessage(@NotNull SocketChannel channel, OutputStream destination) {
         this.channel = channel;
+        // TODO: add buffered
         this.destination = destination;
         buffer = ByteBuffer.allocate(BUFFER_SIZE);
     }
@@ -47,7 +48,7 @@ public class ReadableMessage {
         return read == size && !buffer.hasRemaining();
     }
 
-    protected OutputStream getDestination() {
+    OutputStream getDestination() {
         return destination;
     }
 }

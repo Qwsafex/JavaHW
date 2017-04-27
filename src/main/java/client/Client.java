@@ -7,10 +7,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.NotYetConnectedException;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class Client {
@@ -18,11 +16,13 @@ public class Client {
 
     private final SocketChannel channel;
 
+    @SuppressWarnings("WeakerAccess")
     public Client() throws IOException {
         channel = SocketChannel.open();
         channel.configureBlocking(false);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void connect(String hostname, int port) throws IOException {
         System.out.println("connecting to " + hostname + ":" + port);
         if (channel.isConnected()) return;
@@ -33,10 +33,12 @@ public class Client {
             //System.out.println("not connected");
         }
     }
+    @SuppressWarnings("WeakerAccess")
     public void disconnect() throws IOException {
         channel.close();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public List<SimpleFile> executeList(String path) throws IOException {
         sendRequest(createSentData((byte) Query.LIST.ordinal(), path.getBytes()));
         byte[] response = getSmallResponse();
@@ -51,6 +53,7 @@ public class Client {
     }
 
 
+    @SuppressWarnings("WeakerAccess")
     public String executeGet(String path) throws IOException {
         sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes()));
         return getBigResponse().getFilename();
@@ -83,7 +86,7 @@ public class Client {
     }
 
     private byte[] createSentData(byte first, byte[] rest) {
-        return ArrayUtils.addAll(ByteBuffer.allocate(1).put(first).array(), rest);
+        return ArrayUtils.addAll(ByteUtils.byteToBytes(first), rest);
     }
 
 }

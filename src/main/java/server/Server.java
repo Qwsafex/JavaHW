@@ -1,7 +1,6 @@
 package server;
 
 import utils.SmallReadableMessage;
-import utils.SmallWritableMessage;
 import utils.WritableMessage;
 
 import java.io.IOException;
@@ -10,10 +9,19 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.file.Path;
 import java.util.Iterator;
 
 public class Server {
+    private final Path root;
+
+    public Server(Path root) {
+        this.root = root;
+    }
+
+    @SuppressWarnings("WeakerAccess")
     public void run(String hostname, int port) throws IOException {
+        FileSystem fileSystem = new FileSystem(root);
         System.out.println("run");
         Selector selector = Selector.open();
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
@@ -22,8 +30,7 @@ public class Server {
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         QueryProcessor queryProcessor = new QueryProcessor();
-        while (true) {
-            //System.out.println("hey");
+        while (!Thread.interrupted()) {
             selector.selectNow();
             Iterator<SelectionKey> keyIterator = selector.selectedKeys().iterator();
             while (keyIterator.hasNext()) {
@@ -39,7 +46,7 @@ public class Server {
                     SmallReadableMessage message = (SmallReadableMessage) selectionKey.attachment();
                     if (message.read()) {
                         SelectionKey newSelectionKey = selectionKey.channel().register(selector, SelectionKey.OP_WRITE);
-                        newSelectionKey.attach(queryProcessor.process(message.getData()).generateMessage(message.getChannel()));
+                        newSelectionKey.attach(queryProcessor.process(message.getData(), fileSystem).generateMessage(message.getChannel()));
                     }
                 }
                 if (selectionKey.isWritable()) {

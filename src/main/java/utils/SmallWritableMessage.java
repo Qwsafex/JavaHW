@@ -5,7 +5,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 public class SmallWritableMessage extends WritableMessage {

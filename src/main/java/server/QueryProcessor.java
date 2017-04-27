@@ -11,25 +11,22 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 class QueryProcessor {
-    Response process(@NotNull byte[] data) throws IOException {
+    Response process(@NotNull byte[] data, FileSystem fileSystem) throws IOException {
         Query queryType = Query.values()[data[0]];
         String path = new String(data, 1, data.length - 1, StandardCharsets.UTF_8);
 
         switch (queryType) {
             case GET: {
-                return new GetResponse(Paths.get(path));
+                return new GetResponse(fileSystem.getOutputStream(Paths.get(path)));
             }
             case LIST: {
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
                 ObjectOutputStream objectStream = new ObjectOutputStream(byteStream);
-                ArrayList<SimpleFile> files = new ArrayList<>(Files.list(Paths.get(path))
-                        .map(p -> new SimpleFile(p.toString(), Files.isDirectory(p))).collect(Collectors.toList()));
+                ArrayList<SimpleFile> files = fileSystem.list(Paths.get(path));
                 objectStream.writeObject(files);
                 objectStream.flush();
                 return new ListResponse(byteStream.toByteArray());

@@ -3,18 +3,18 @@ package utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.SocketChannel;
-import java.nio.file.Path;
 
 public class GetResponse implements Response {
-    @NotNull private Path path;
+    private final InputStream source;
 
-    public GetResponse(@NotNull Path path) {
-        this.path = path;
+    public GetResponse(@NotNull InputStream source) {
+        this.source = source;
     }
 
     @Override
     public WritableMessage generateMessage(@NotNull SocketChannel channel) throws IOException {
-        return new BigWritableMessage(channel, path);
+        return new BigWritableMessage(channel, source);
     }
 }

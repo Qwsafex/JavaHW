@@ -3,26 +3,26 @@ package server;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class ServerConsoleApp {
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
-        @Nullable
-        Thread serverThread = null;
+
+        @Nullable Thread serverThread = null;
+
         while (true) {
             System.out.println("cycling");
             String command = scanner.next();
+            boolean shutdown = false;
             switch(command) {
                 case "start": {
-                    //String hostname = scanner.next();
-                    //int port = scanner.nextInt();
-                    String hostname = "localhost";
-                    int port = 1234;
+                    String hostname = scanner.next();
+                    int port = scanner.nextInt();
                     serverThread = new Thread(() -> {
-                        Server server = new Server();
+                        Server server = new Server(Paths.get("."));
                         try {
                             server.run(hostname, port);
                         } catch (IOException e) {
@@ -41,6 +41,16 @@ public class ServerConsoleApp {
                     }
                     break;
                 }
+                case "shutdown": {
+                    shutdown = true;
+                    break;
+                }
+                default: {
+                    System.out.println("Usage: start HOST PORT | stop | shutdown");
+                }
+            }
+            if (shutdown) {
+                break;
             }
         }
     }

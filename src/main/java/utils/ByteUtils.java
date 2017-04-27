@@ -3,16 +3,18 @@ package utils;
 import java.nio.ByteBuffer;
 
 public class ByteUtils {
-    private static ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+    private static final ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
+    private static final ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
 
+    @SuppressWarnings("WeakerAccess")
     public static byte[] longToBytes(long x) {
-        buffer.putLong(0, x);
-        return buffer.array();
+        longBuffer.putLong(0, x);
+        longBuffer.clear();
+        return longBuffer.array().clone();
     }
-
-    public static long bytesToLong(byte[] bytes) {
-        buffer.put(bytes, 0, bytes.length);
-        buffer.flip();
-        return buffer.getLong();
+    public static byte[] byteToBytes(byte x) {
+        byteBuffer.put(x);
+        byteBuffer.clear();
+        return byteBuffer.array().clone();
     }
 }

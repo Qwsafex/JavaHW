@@ -14,9 +14,10 @@ public class WritableMessage {
     private long leftSource;
     private SocketChannel channel;
     private InputStream source;
-    public WritableMessage(@NotNull SocketChannel channel, @NotNull InputStream source, long size) {
+    WritableMessage(@NotNull SocketChannel channel, @NotNull InputStream source, long size) {
         this.leftSource = size;
         this.channel = channel;
+        // TODO: add buffered
         this.source = source;
         this.buffer = ByteBuffer.allocate(BUFFER_SIZE);
         this.buffer.limit(0);
