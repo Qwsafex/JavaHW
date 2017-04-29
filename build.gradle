@@ -14,3 +14,25 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 }
+
+task serverJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Ftp server jar file',
+                'Implementation-Version': version,
+                'Main-Class': 'ru.spbau.zhidkov.server.MainServer'
+    }
+    baseName = 'ftp-server'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task clientJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Ftp client jar file',
+                'Implementation-Version': version,
+                'Main-Class': 'ru.spbau.zhidkov.client.MainClient'
+    }
+    baseName = 'ftp-client'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
