@@ -16,6 +16,12 @@ import java.util.Iterator;
 class NonBlockingServer implements FTPServer {
     private final Path root;
 
+    public boolean isReady() {
+        return ready;
+    }
+
+    private Boolean ready = false;
+
     NonBlockingServer(Path root) {
         this.root = root;
     }
@@ -23,14 +29,15 @@ class NonBlockingServer implements FTPServer {
     @Override
     public void run(@NotNull String hostname, int port) throws IOException {
         FileSystem fileSystem = new FileSystem(root);
-        System.out.println("run");
         Selector selector = Selector.open();
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-        System.out.println("binded to " + hostname + ":" + port);
         serverSocketChannel.bind(new InetSocketAddress(hostname, port));
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         QueryProcessor queryProcessor = new QueryProcessor();
+        synchronized (this) {
+            ready = true;
+        }
         while (!Thread.interrupted()) {
             selector.selectNow();
             Iterator<SelectionKey> keyIterator = selector.selectedKeys().iterator();

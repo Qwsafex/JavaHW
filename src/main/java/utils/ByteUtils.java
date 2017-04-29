@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  */
 public class ByteUtils {
     private static final ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
-    private static final ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
+    private static final ByteBuffer byteBuffer = ByteBuffer.allocate(Byte.BYTES);
 
     /**
      * Converts long to byte array.

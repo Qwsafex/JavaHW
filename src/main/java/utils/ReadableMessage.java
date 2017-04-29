@@ -43,9 +43,9 @@ public class ReadableMessage {
      * @throws IOException If an I/O error occurs.
      */
     public boolean read() throws IOException {
-        if (read < 4) {
+        if (read < Long.BYTES) {
             read += channel.read(buffer);
-            if (read >= 4) {
+            if (read >= Long.BYTES) {
                 buffer.flip();
                 size = buffer.getLong();
             }

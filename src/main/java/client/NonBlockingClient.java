@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.nio.channels.NotYetConnectedException;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -28,7 +29,6 @@ class NonBlockingClient implements Client{
 
     @Override
     public void connect(@NotNull String hostname, int port) throws IOException {
-        System.out.println("connecting to " + hostname + ":" + port);
         if (channel.isConnected()) return;
         channel.connect(new InetSocketAddress(hostname, port));
 
@@ -45,7 +45,7 @@ class NonBlockingClient implements Client{
     @NotNull
     @Override
     public List<SimpleFile> executeList(@NotNull String path) throws IOException {
-        sendRequest(createSentData((byte) Query.LIST.ordinal(), path.getBytes()));
+        sendRequest(createSentData((byte) Query.LIST.ordinal(), path.getBytes(StandardCharsets.UTF_8)));
         byte[] response = getSmallResponse();
         ObjectInputStream objectStream = new ObjectInputStream(new ByteArrayInputStream(response));
         try {
@@ -61,7 +61,7 @@ class NonBlockingClient implements Client{
     @NotNull
     @Override
     public Path executeGet(@NotNull String path) throws IOException {
-        sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes()));
+        sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes(StandardCharsets.UTF_8)));
         return getBigResponse().getPath();
     }
 

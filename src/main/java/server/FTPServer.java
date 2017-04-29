@@ -29,4 +29,10 @@ public interface FTPServer {
     static FTPServer getNonBlocking(@NotNull Path root) {
         return new NonBlockingServer(root);
     }
+
+    /**
+     * Returns whether server is ready to accept connections.
+     * @return true if server is ready to accept incoming connections and false otherwise
+     */
+    boolean isReady();
 }
