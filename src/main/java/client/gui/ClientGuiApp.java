@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 public class ClientGuiApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        Scene scene = SceneFactory.create();
+        Scene scene = new SceneFactory().create();
         stage.setScene(scene);
         stage.show();
     }
