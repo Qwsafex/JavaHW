@@ -19,20 +19,30 @@ task serverJar(type: Jar) {
     manifest {
         attributes 'Implementation-Title': 'Ftp server jar file',
                 'Implementation-Version': version,
-                'Main-Class': 'ru.spbau.zhidkov.server.MainServer'
+                'Main-Class': 'server.ServerConsoleApp'
     }
     baseName = 'ftp-server'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
-task clientJar(type: Jar) {
+task consoleClientJar(type: Jar) {
     manifest {
-        attributes 'Implementation-Title': 'Ftp client jar file',
+        attributes 'Implementation-Title': 'Ftp console client jar file',
                 'Implementation-Version': version,
-                'Main-Class': 'ru.spbau.zhidkov.client.MainClient'
+                'Main-Class': 'client.ClientConsoleApp'
     }
-    baseName = 'ftp-client'
+    baseName = 'ftp-client-console'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+task guiClientJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Ftp gui client jar file',
+                'Implementation-Version': version,
+                'Main-Class': 'client.gui.ClientGuiApp'
+    }
+    baseName = 'ftp-client-gui'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
