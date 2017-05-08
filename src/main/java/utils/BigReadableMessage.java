@@ -1,6 +1,7 @@
 package utils;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
@@ -20,8 +21,10 @@ public class BigReadableMessage extends ReadableMessage {
      * @param channel channel to read data from
      * @throws IOException If an I/O error occurs
      */
-    public BigReadableMessage(@NotNull SocketChannel channel) throws IOException {
-        super(channel, new KnownFileOutputStream(Files.createTempFile("dwnl", "").toFile()));
+    public BigReadableMessage(@NotNull SocketChannel channel, @Nullable Path destination) throws IOException {
+            super(channel, (destination != null ?
+                    new KnownFileOutputStream(Files.createTempFile(destination, "dwnl", "").toFile()) :
+                    new KnownFileOutputStream(Files.createTempFile("dwnl", "").toFile())));
         path = ((KnownFileOutputStream) getDestination()).getFile().getAbsolutePath();
     }
 

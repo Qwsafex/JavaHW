@@ -13,20 +13,21 @@ import javafx.scene.layout.VBox;
 import utils.SimpleFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SceneFactory {
+class SceneFactory {
     private TextField hostnameTextField;
     private TextField portTextField;
-    private TextField currentDirectoryTextField;
     private TextField filePathTextField;
     private TextArea resultTextArea;
+    private TextField destinationTextField;
 
     private static class VBoxBuilder {
         private List<Node> nodeList;
 
-        public VBoxBuilder() {
+        VBoxBuilder() {
             this.nodeList = new ArrayList<>();
         }
 
@@ -47,7 +48,7 @@ public class SceneFactory {
 
     private static final double MIN_WIDTH = 400;
 
-    public Scene create() {
+    Scene create() {
         VBoxBuilder vBoxBuilder = new VBoxBuilder();
 
 
@@ -59,8 +60,7 @@ public class SceneFactory {
 
         hostnameTextField = new TextField();
         portTextField = new TextField();
-        currentDirectoryTextField = new TextField();
-        currentDirectoryTextField.setEditable(false);
+        destinationTextField = new TextField();
         filePathTextField = new TextField();
         Button getRequestButton = new Button("Get file");
         getRequestButton.setOnMouseClicked(this::performGetRequest);
@@ -77,7 +77,7 @@ public class SceneFactory {
         table.getColumns().setAll(firstNameCol, lastNameCol);
 
         VBox root = vBoxBuilder.addNodesHorizontally(new Label("Hostname:"), hostnameTextField, new Label("Port:"), portTextField)
-                .addNodesHorizontally(new Label("Current directory:"), currentDirectoryTextField)
+                .addNodesHorizontally(new Label("Download directory:"), destinationTextField)
                 .addNodesHorizontally(filePathTextField, getRequestButton, listRequestButton)
                 .addNodesHorizontally(resultTextArea)
                 .build();
@@ -112,6 +112,21 @@ public class SceneFactory {
     }
 
     private void performGetRequest(MouseEvent mouseEvent) {
+        System.err.println("listing");
+        try {
+            Client client = Client.getNonBlocking();
+            System.err.println("connecting");
+            client.connect(hostnameTextField.getText(), Integer.parseInt(portTextField.getText()));
+            System.err.println("requesting");
+            String destination = destinationTextField.getText();
+            Path result = client.executeGet(filePathTextField.getText(),
+                    destination.isEmpty() ? null : destination);
+            System.err.println("result:");
+            System.err.println(result.toAbsolutePath().toString());
+            showAlert(Alert.AlertType.INFORMATION, result.toAbsolutePath().toString());
+            client.disconnect();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error while performing list request: " + e.getMessage());
+        }
     }
-
 }

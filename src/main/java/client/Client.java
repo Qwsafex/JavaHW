@@ -1,6 +1,7 @@
 package client;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import utils.SimpleFile;
 
 import java.io.IOException;
@@ -56,7 +57,19 @@ public interface Client {
      * @throws IOException If an I/O error occurs
      */
     @NotNull
-    Path executeGet(@NotNull String path) throws IOException ;
+    default Path executeGet(@NotNull String path) throws IOException {
+        return executeGet(path, null);
+    }
+
+    /**
+     * Downloads file to a specified directory.
+     * @param path path to file on server
+     * @param destinationFolder path to destination folder on client
+     * @return path to downloaded file on client
+     * @throws IOException If an I/O error occurs
+     */
+    @NotNull
+    Path executeGet(@NotNull String path, @Nullable String destinationFolder) throws IOException ;
 
     /**
      * Creates non-blocking FTP client.

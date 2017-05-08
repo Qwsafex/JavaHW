@@ -2,6 +2,7 @@ package client;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import utils.*;
 
 import java.io.ByteArrayInputStream;
@@ -12,6 +13,7 @@ import java.nio.channels.NotYetConnectedException;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -60,9 +62,10 @@ class NonBlockingClient implements Client{
 
     @NotNull
     @Override
-    public Path executeGet(@NotNull String path) throws IOException {
+    public Path executeGet(@NotNull String path, @Nullable String destination) throws IOException {
         sendRequest(createSentData((byte) Query.GET.ordinal(), path.getBytes(StandardCharsets.UTF_8)));
-        return getBigResponse().getPath();
+        Path destinationPath = (destination == null ? null : Paths.get(destination));
+        return getBigResponse(destinationPath).getPath();
     }
 
     @NotNull
@@ -73,8 +76,8 @@ class NonBlockingClient implements Client{
     }
 
     @NotNull
-    private BigReadableMessage getBigResponse() throws IOException {
-        BigReadableMessage message = new BigReadableMessage(channel);
+    private BigReadableMessage getBigResponse(@Nullable Path destination) throws IOException {
+        BigReadableMessage message = new BigReadableMessage(channel, destination);
         getResponse(message);
         return message;
     }
