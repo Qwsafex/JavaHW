@@ -2,11 +2,14 @@ import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.reactfx.util.FxTimer;
+
+import java.util.ArrayList;
 
 public class PairGUI extends Application {
     private static final double MIN_WIDTH = 0;
@@ -20,12 +23,20 @@ public class PairGUI extends Application {
     private int prevClickI, prevClickJ;
     private boolean clicked = false;
     private Button[][] buttons;
+    private int score = 0;
+    private Label scoreLabel;
+    private int clicks = 0;
+    private Label clicksLabel;
 
 
     public void start(Stage stage) throws Exception {
         field = new Field(N);
 
-        Node[] rows = new Node[N];
+        ArrayList<Node> nodes = new ArrayList<>();
+        scoreLabel = new Label("0/" + String.valueOf(N*N/2));
+        clicksLabel = new Label("0");
+        nodes.add(packToRow(new Label("Your score: "), scoreLabel));
+        nodes.add(packToRow(new Label("Clicks made: "), clicksLabel));
 
         buttons = new Button[N][N];
 
@@ -39,10 +50,12 @@ public class PairGUI extends Application {
                 int j1 = j;
                 buttons[i][j].setOnMouseClicked(event -> buttonClicked(i1, j1, event));
             }
-            rows[i] = new HBox(SPACING, buttons[i]);
+            nodes.add(new HBox(SPACING, buttons[i]));
         }
 
-        VBox vbox = new VBox(rows);
+        Node[] nodeArray = new Node[1];
+        nodeArray = nodes.toArray(nodeArray);
+        VBox vbox = new VBox(nodeArray);
         vbox.setMinWidth(MIN_WIDTH);
         vbox.setSpacing(SPACING);
 
@@ -50,7 +63,13 @@ public class PairGUI extends Application {
         stage.show();
     }
 
+    private Node packToRow(Node... nodes) {
+        return new HBox(SPACING, nodes);
+    }
+
     private void buttonClicked(int i, int j, MouseEvent mouseEvent) {
+        clicks++;
+        clicksLabel.setText(String.valueOf(clicks));
         buttons[i][j].setText(String.valueOf(field.get(i,j)));
         buttons[i][j].setDisable(true);
 
@@ -67,6 +86,10 @@ public class PairGUI extends Application {
                             buttons[i1][j1].setText(DEFAULT_CHAR);
                         }
                 );
+            }
+            else {
+                score++;
+                scoreLabel.setText(score + "/" + String.valueOf(N*N/2));
             }
             clicked = false;
         }
