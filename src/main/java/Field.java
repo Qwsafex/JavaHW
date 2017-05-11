@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Field {
+class Field {
     private final int[][] field;
 
     Field(int n){
