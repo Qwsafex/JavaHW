@@ -19,7 +19,7 @@ public class PairGUI extends Application {
     private static final String DEFAULT_CHAR = "*";
     private static final long HIDE_DELAY = 200;
     private static final double BUTTON_SIDE = 40;
-    private static int N = 2;
+    private static int N = 6;
 
     private Field field;
     private int prevClickI, prevClickJ;
