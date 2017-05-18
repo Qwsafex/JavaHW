@@ -40,7 +40,7 @@ public class XUnit {
     }
 
     private void assertInstanceParameterless(@NotNull List<Method> methods) throws IllegalTestClassException {
-        if (methods.stream().anyMatch(method -> !Modifier.isStatic(method.getModifiers()))) {
+        if (methods.stream().anyMatch(method -> Modifier.isStatic(method.getModifiers()))) {
             throw new IllegalTestClassException("XBefore/XAfter methods should not be static!");
         }
         assertParameterless(methods);
@@ -68,7 +68,7 @@ public class XUnit {
             logWriter.println("Running test " + testMethod.getName());
             final String ignoreReason = testMethod.getAnnotation(XTest.class).ignore();
             if (!ignoreReason.isEmpty()) {
-                logWriter.println("Ignored. Reason: " + ignoreReason);
+                printIgnored(ignoreReason);
                 continue;
             }
             if (!executeMethods(testObject, beforeMethods)) {
@@ -83,6 +83,7 @@ public class XUnit {
         logWriter.println("Running XAfterClass methods...");
         executeStaticMethods(afterClass);
     }
+
 
     private void executeTestMethod(@NotNull Object testObject, @NotNull Method testMethod) {
         Throwable caughtException = null;
@@ -104,27 +105,43 @@ public class XUnit {
                 printSuccess(executionTime);
             }
             else {
-                logWriter.println("XTest failed:");
-                caughtException.printStackTrace(logWriter);
+                printUnexpectedException(caughtException);
             }
         }
         else {
             if (caughtException == null) {
-                logWriter.println("XTest failed: expected " + expectedException);
+                printExpectedButNotThrown(expectedException);
             }
             else {
                 if (expectedException.isAssignableFrom(caughtException.getClass())) {
                     printSuccess(executionTime);
                 }
                 else {
-                    logWriter.println("XTest failed: expected " + expectedException +
-                            " but got " + caughtException.getClass());
+                    printExpectedButOtherThrown(expectedException, caughtException.getClass());
                 }
             }
         }
     }
 
-    private void printSuccess(double executionTime) {
+    void printIgnored(String ignoreReason) {
+        logWriter.println("Ignored. Reason: " + ignoreReason);
+    }
+    void printExpectedButOtherThrown(@NotNull Class<? extends Throwable> expectedException,
+                                             @NotNull Class<? extends Throwable> caughtException) {
+        logWriter.println("XTest failed: expected " + expectedException +
+                " but got " + caughtException);
+    }
+
+    void printExpectedButNotThrown(@NotNull Class<? extends Throwable> expectedException) {
+        logWriter.println("XTest failed: expected " + expectedException);
+    }
+
+    void printUnexpectedException(@NotNull Throwable caughtException) {
+        logWriter.println("XTest failed:");
+        caughtException.printStackTrace(logWriter);
+    }
+
+    void printSuccess(double executionTime) {
         logWriter.println("XTest passed in " + executionTime + "s");
     }
 

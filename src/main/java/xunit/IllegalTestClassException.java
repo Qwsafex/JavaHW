@@ -1,6 +1,6 @@
 package xunit;
 
-public class IllegalTestClassException extends Throwable {
+public class IllegalTestClassException extends Exception {
     public IllegalTestClassException() {
     }
 
