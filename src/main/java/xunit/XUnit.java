@@ -14,14 +14,32 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Class that provides method to test all methods of some class annotated with @XTest
+ */
 @SuppressWarnings("WeakerAccess")
 public class XUnit {
     @NotNull
     private final PrintWriter logWriter;
 
+    /**
+     * Creates new instance that will log itself's execution with given object.
+     * @param logWriter object that to be used for logging
+     */
     public XUnit(@NotNull PrintWriter logWriter) {
         this.logWriter = logWriter;
     }
+
+    /**
+     * Runs all methods of given class that are annotated wit @XTest.
+     *
+     * Before running any of these methods @BeforeClass methods are invoked.
+     * After running all of these methods @AfterClass methods are invoked.
+     * Before running each of these methods @Before methods are invoked.
+     * After running each of these methods @After methods are invoked.
+     * @param className name of class to be tested
+     * @throws IllegalTestClassException if given class is malformed or can't be loaded
+     */
     public void test(@NotNull String className) throws IllegalTestClassException {
         logWriter.println("Testing class " + className + "...");
         Class<?> testedClass = getTestedClass(className);
@@ -189,7 +207,7 @@ public class XUnit {
         try {
             return Class.forName(className);
         } catch (ClassNotFoundException e) {
-            throw new IllegalTestClassException();
+            throw new IllegalTestClassException("Can't found " + className + " class!");
         }
     }
 }
