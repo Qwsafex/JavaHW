@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("WeakerAccess")
 public class XUnit {
     @NotNull
     private final PrintWriter logWriter;
@@ -92,7 +93,7 @@ public class XUnit {
         try {
             testMethod.invoke(testObject);
         } catch (IllegalAccessException e) {
-            logWriter.println("Method is unaccessible!");
+            logWriter.println("Method is private!");
             return;
         } catch (InvocationTargetException e) {
             caughtException = e.getCause();

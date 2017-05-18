@@ -1,14 +1,15 @@
 package xunit;
 
+@SuppressWarnings("WeakerAccess")
 public class IllegalTestClassException extends Exception {
-    public IllegalTestClassException() {
+    IllegalTestClassException() {
     }
 
-    public IllegalTestClassException(String s) {
+    IllegalTestClassException(String s) {
         super(s);
     }
 
-    public IllegalTestClassException(String s, Exception e) {
+    IllegalTestClassException(String s, Exception e) {
         super(s, e);
     }
 }

@@ -66,6 +66,7 @@ public class XUnitTest {
     }
 
 
+    @SuppressWarnings("WeakerAccess")
     public static class SuccessfulClass {
         @XTest
         public void test1(){}
@@ -79,6 +80,7 @@ public class XUnitTest {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class UnexpectedExceptionClass {
         @XTest
         public void test1() throws Exception {
@@ -86,11 +88,13 @@ public class XUnitTest {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class NotThrownClass {
         @XTest(expected = Exception.class)
         public void test1() {}
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class OtherThrownClass {
         @XTest(expected = IOException.class)
         public void test1() throws Exception {
@@ -98,6 +102,7 @@ public class XUnitTest {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class IgnoredClass {
         @XTest(ignore = "For testing purposes")
         public void test1() {}
