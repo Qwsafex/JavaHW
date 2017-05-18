@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Method marked with this annotation should been
- * started before every test method.
+ * Method marked with this annotation should be called
+ * before class is been started to test.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Before {
+public @interface XBeforeClass {
 }
