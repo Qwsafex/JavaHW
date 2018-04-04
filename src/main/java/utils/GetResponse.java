@@ -1,0 +1,28 @@
+package utils;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.SocketChannel;
+
+/**
+ * Class encapsulating response to Query.GET query.
+ */
+public class GetResponse implements Response {
+    private final InputStream source;
+
+    /**
+     * Creates new response encapsulating given data.
+     * @param source {@link InputStream} to read response data from
+     */
+    public GetResponse(@NotNull InputStream source) {
+        this.source = source;
+    }
+
+
+    @Override
+    public WritableMessage generateMessage(@NotNull SocketChannel channel) throws IOException {
+        return new BigWritableMessage(channel, source);
+    }
+}
